@@ -1,2 +1,7 @@
 venv/
 instance/
+.venv/
+.env
+*.pyc
+__pycache__/
+alembic.ini

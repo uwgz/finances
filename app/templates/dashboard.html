@@ -1,0 +1,228 @@
+{% extends "_base.html" %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="dashboard-header">
+        <h1>My Finances</h1>
+        <a href="#" class="btn primary">Add Transaction</a>
+    </div>
+
+    <div class="period-filters">
+        <a href="#" class="period-btn active">Weekly</a>
+        <a href="#" class="period-btn">Monthly</a>
+        <a href="#" class="period-btn">Quarterly</a>
+        <a href="#" class="period-btn">Yearly</a>
+    </div>
+
+    <div class="summary-cards">
+        <div class="card">
+            <div class="card-header">
+                <h2>Total Income</h2>
+                <div class="trend up">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+            <div class="card-value income">
+                $4,250.00
+            </div>
+            <div class="card-footer">
+                Monthly earnings
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Total Expenses</h2>
+                <div class="trend down">
+                    <i class="fas fa-arrow-down"></i>
+                </div>
+            </div>
+            <div class="card-value expenses">
+                $3,200.00
+            </div>
+            <div class="card-footer">
+                Monthly spending
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h2>Net Balance</h2>
+                <div class="trend up">
+                    <i class="fas fa-arrow-up"></i>
+                </div>
+            </div>
+            <div class="card-value income">
+                $1,050.00
+            </div>
+            <div class="card-footer">
+                Profit for monthly period
+            </div>
+        </div>
+    </div>
+
+    <div class="chart-container">
+        <h2>Income vs. Expenses Over Time</h2>
+        <div class="chart" id="incomeExpensesChart"></div>
+        <div class="chart-legend">
+            <div class="legend-item">
+                <div class="color-box income"></div>
+                <span>Income</span>
+            </div>
+            <div class="legend-item">
+                <div class="color-box expenses"></div>
+                <span>Expenses</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="recent-transactions">
+        <div class="section-header">
+            <h2>Recent Transactions</h2>
+            <a href="#" class="btn small">View All</a>
+        </div>
+        <div class="transactions-list">
+            <table class="transactions-table">
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Description</th>
+                        <th>Category</th>
+                        <th>Amount</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>2025-05-15</td>
+                        <td>Salary</td>
+                        <td>
+                            <span class="category-tag income">
+                                Income
+                            </span>
+                        </td>
+                        <td class="amount income">
+                            +$3,500.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-14</td>
+                        <td>Grocery shopping</td>
+                        <td>
+                            <span class="category-tag food">
+                                Food
+                            </span>
+                        </td>
+                        <td class="amount expenses">
+                            -$150.75
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-12</td>
+                        <td>Electricity bill</td>
+                        <td>
+                            <span class="category-tag utilities">
+                                Utilities
+                            </span>
+                        </td>
+                        <td class="amount expenses">
+                            -$87.50
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-10</td>
+                        <td>Freelance work</td>
+                        <td>
+                            <span class="category-tag income">
+                                Income
+                            </span>
+                        </td>
+                        <td class="amount income">
+                            +$750.00
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>2025-05-08</td>
+                        <td>Restaurant dinner</td>
+                        <td>
+                            <span class="category-tag entertainment">
+                                Entertainment
+                            </span>
+                        </td>
+                        <td class="amount expenses">
+                            -$65.30
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Chart data (static placeholder data)
+    const chartData = {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+        income: [3200, 3500, 3700, 4000, 4250, 4100],
+        expenses: [2800, 3000, 2900, 3200, 3200, 3100]
+    };
+    
+    // Create the chart
+    const ctx = document.getElementById('incomeExpensesChart').getContext('2d');
+    const chart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: chartData.labels,
+            datasets: [
+                {
+                    label: 'Income',
+                    data: chartData.income,
+                    backgroundColor: '#0099ff',
+                    borderColor: '#0088ee',
+                    borderWidth: 1
+                },
+                {
+                    label: 'Expenses',
+                    data: chartData.expenses,
+                    backgroundColor: '#ff4d6d',
+                    borderColor: '#ff3d5d',
+                    borderWidth: 1
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: {
+                        callback: function(value) {
+                            return '$' + value;
+                        }
+                    }
+                }
+            },
+            plugins: {
+                legend: {
+                    display: false
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return context.dataset.label + ': $' + context.raw.toFixed(2);
+                        }
+                    }
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

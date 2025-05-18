@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Finances - {% block title %}{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        {% if current_user.is_authenticated %}
+        <!-- Sidebar - Only visible when authenticated -->
+        <aside class="sidebar">
+            <div class="brand">
+                <div class="logo">
+                    <i class="fas fa-dollar-sign"></i>
+                </div>
+                <h1>My Finances</h1>
+            </div>
+            
+            <nav class="side-nav">
+                <ul>
+                    <li class="{% if request.endpoint == 'dashboard' %}active{% endif %}">
+                        <a href="{{ url_for('main.dashboard') }}">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.endpoint == 'transactions' %}active{% endif %}">
+                        <a href="#">
+                            <i class="fas fa-list"></i>
+                            <span>Transactions</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.endpoint == 'analysis' %}active{% endif %}">
+                        <a href="#">
+                            <i class="fas fa-chart-line"></i>
+                            <span>Analysis</span>
+                        </a>
+                    </li>
+                    <li class="{% if request.endpoint == 'settings' %}active{% endif %}">
+                        <a href="#">
+                            <i class="fas fa-cog"></i>
+                            <span>Settings</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+        {% endif %}
+
+        <div class="main-content {% if not current_user.is_authenticated %}full-width{% endif %}">
+            <!-- Top navigation - Always visible but changes based on auth state -->
+            <header class="top-header">
+                {% if not current_user.is_authenticated %}
+                <div class="brand">
+                    <div class="logo">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <h1>My Finances</h1>
+                </div>
+                <nav class="top-nav">
+                    <ul>
+                        <li><a href="{{ url_for('main.index') }}">Home</a></li>
+                        <li><a href="#">Features</a></li>
+                        <li><a href="#">Pricing</a></li>
+                        <li><a href="{{ url_for('main.login') }}" class="btn">Login</a></li>
+                        <li><a href="{{ url_for('main.register') }}" class="btn primary">Sign Up</a></li>
+                    </ul>
+                </nav>
+                {% else %}
+                <h1 class="page-title">{% block page_title %}{% endblock %}</h1>
+                <div class="user-section">
+                    <div class="notifications">
+                        <i class="far fa-bell"></i>
+                    </div>
+                    <div class="user-profile">
+                        <img src="{{ url_for('static', filename='images/avatar.png') }}" alt="User Avatar">
+                        <span>{{ current_user.username }}</span>
+                        <div class="dropdown-menu">
+                            <a href="#">Profile</a>
+                            <a href="{{ url_for('main.logout') }}">Logout</a>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </header>
+
+            <!-- Flash messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    <div class="flash-messages">
+                        {% for category, message in messages %}
+                            <div class="alert alert-{{ category }}">
+                                {{ message }}
+                                <button class="close-btn">&times;</button>
+                            </div>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            {% endwith %}
+
+            <!-- Page content -->
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    {% block scripts %}{% endblock %}
+</body>
+</html>
