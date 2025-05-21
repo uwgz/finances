@@ -1,228 +1,862 @@
-{% extends "_base.html" %}
-
-{% block title %}Dashboard{% endblock %}
-{% block page_title %}Dashboard{% endblock %}
-
-{% block content %}
-<div class="dashboard-container">
-    <div class="dashboard-header">
-        <h1>My Finances</h1>
-        <a href="#" class="btn primary">Add Transaction</a>
-    </div>
-
-    <div class="period-filters">
-        <a href="#" class="period-btn active">Weekly</a>
-        <a href="#" class="period-btn">Monthly</a>
-        <a href="#" class="period-btn">Quarterly</a>
-        <a href="#" class="period-btn">Yearly</a>
-    </div>
-
-    <div class="summary-cards">
-        <div class="card">
-            <div class="card-header">
-                <h2>Total Income</h2>
-                <div class="trend up">
-                    <i class="fas fa-arrow-up"></i>
-                </div>
-            </div>
-            <div class="card-value income">
-                $4,250.00
-            </div>
-            <div class="card-footer">
-                Monthly earnings
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>Total Expenses</h2>
-                <div class="trend down">
-                    <i class="fas fa-arrow-down"></i>
-                </div>
-            </div>
-            <div class="card-value expenses">
-                $3,200.00
-            </div>
-            <div class="card-footer">
-                Monthly spending
-            </div>
-        </div>
-
-        <div class="card">
-            <div class="card-header">
-                <h2>Net Balance</h2>
-                <div class="trend up">
-                    <i class="fas fa-arrow-up"></i>
-                </div>
-            </div>
-            <div class="card-value income">
-                $1,050.00
-            </div>
-            <div class="card-footer">
-                Profit for monthly period
-            </div>
-        </div>
-    </div>
-
-    <div class="chart-container">
-        <h2>Income vs. Expenses Over Time</h2>
-        <div class="chart" id="incomeExpensesChart"></div>
-        <div class="chart-legend">
-            <div class="legend-item">
-                <div class="color-box income"></div>
-                <span>Income</span>
-            </div>
-            <div class="legend-item">
-                <div class="color-box expenses"></div>
-                <span>Expenses</span>
-            </div>
-        </div>
-    </div>
-
-    <div class="recent-transactions">
-        <div class="section-header">
-            <h2>Recent Transactions</h2>
-            <a href="#" class="btn small">View All</a>
-        </div>
-        <div class="transactions-list">
-            <table class="transactions-table">
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Description</th>
-                        <th>Category</th>
-                        <th>Amount</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>2025-05-15</td>
-                        <td>Salary</td>
-                        <td>
-                            <span class="category-tag income">
-                                Income
-                            </span>
-                        </td>
-                        <td class="amount income">
-                            +$3,500.00
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2025-05-14</td>
-                        <td>Grocery shopping</td>
-                        <td>
-                            <span class="category-tag food">
-                                Food
-                            </span>
-                        </td>
-                        <td class="amount expenses">
-                            -$150.75
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2025-05-12</td>
-                        <td>Electricity bill</td>
-                        <td>
-                            <span class="category-tag utilities">
-                                Utilities
-                            </span>
-                        </td>
-                        <td class="amount expenses">
-                            -$87.50
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2025-05-10</td>
-                        <td>Freelance work</td>
-                        <td>
-                            <span class="category-tag income">
-                                Income
-                            </span>
-                        </td>
-                        <td class="amount income">
-                            +$750.00
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>2025-05-08</td>
-                        <td>Restaurant dinner</td>
-                        <td>
-                            <span class="category-tag entertainment">
-                                Entertainment
-                            </span>
-                        </td>
-                        <td class="amount expenses">
-                            -$65.30
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-</div>
-{% endblock %}
-
-{% block scripts %}
-<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Chart data (static placeholder data)
-    const chartData = {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        income: [3200, 3500, 3700, 4000, 4250, 4100],
-        expenses: [2800, 3000, 2900, 3200, 3200, 3100]
-    };
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Finances - Personal Balance Sheet</title>
+    <meta name="description" content="Track and analyze your personal finances">
+    <meta name="author" content="My Finances">
     
-    // Create the chart
-    const ctx = document.getElementById('incomeExpensesChart').getContext('2d');
-    const chart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: chartData.labels,
-            datasets: [
-                {
-                    label: 'Income',
-                    data: chartData.income,
-                    backgroundColor: '#0099ff',
-                    borderColor: '#0088ee',
-                    borderWidth: 1
-                },
-                {
-                    label: 'Expenses',
-                    data: chartData.expenses,
-                    backgroundColor: '#ff4d6d',
-                    borderColor: '#ff3d5d',
-                    borderWidth: 1
-                }
-            ]
-        },
-        options: {
-            responsive: true,
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        callback: function(value) {
-                            return '$' + value;
-                        }
-                    }
-                }
-            },
-            plugins: {
-                legend: {
-                    display: false
-                },
-                tooltip: {
-                    callbacks: {
-                        label: function(context) {
-                            return context.dataset.label + ': $' + context.raw.toFixed(2);
-                        }
-                    }
-                }
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    
+    <style>
+        :root {
+            --finance-income: #0EA5E9;
+            --finance-expense: #F43F5E;
+            --finance-positive: #10B981;
+            --finance-negative: #F43F5E;
+        }
+        
+        .dark {
+            --finance-income: #38BDF8;
+            --finance-expense: #FB7185;
+            --finance-positive: #34D399;
+            --finance-negative: #FB7185;
+        }
+        
+        .text-finance-income {
+            color: var(--finance-income);
+        }
+        
+        .text-finance-expense {
+            color: var(--finance-expense);
+        }
+        
+        .text-finance-positive {
+            color: var(--finance-positive);
+        }
+        
+        .text-finance-negative {
+            color: var(--finance-negative);
+        }
+        
+        .animate-fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .animate-slide-up {
+            animation: slideUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
             }
         }
+    </style>
+</head>
+<body class="bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
+    <div id="root">
+        <div class="min-h-screen flex">
+            <!-- Sidebar -->
+            <aside class="fixed inset-y-0 left-0 z-50 w-64 transform bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transition-transform duration-300 ease-in-out">
+                <div class="flex items-center justify-between h-16 px-4 border-b dark:border-gray-700">
+                    <div class="flex items-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-8 w-8 text-finance-income">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
+                            <path d="M12 18V6"></path>
+                        </svg>
+                        <span class="ml-2 text-lg font-semibold dark:text-white">My Finances</span>
+                    </div>
+                </div>
+                <nav class="flex-1 px-2 py-4 space-y-1">
+                    <a class="flex items-center px-4 py-2 text-sm rounded-md transition-colors bg-gray-100 dark:bg-gray-700 text-finance-income font-medium dark:text-blue-300" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 h-5 w-5 text-finance-income">
+                            <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
+                            <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                        </svg>
+                        Dashboard
+                    </a>
+                    <a class="flex items-center px-4 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 h-5 w-5">
+                            <path d="M3 12h.01"></path>
+                            <path d="M3 18h.01"></path>
+                            <path d="M3 6h.01"></path>
+                            <path d="M8 12h13"></path>
+                            <path d="M8 18h13"></path>
+                            <path d="M8 6h13"></path>
+                        </svg>
+                        Transactions
+                    </a>
+                    <a class="flex items-center px-4 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 h-5 w-5">
+                            <path d="M21 12c.552 0 1.005-.449.95-.998a10 10 0 0 0-8.953-8.951c-.55-.055-.998.398-.998.95v8a1 1 0 0 0 1 1z"></path>
+                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                        </svg>
+                        Analysis
+                    </a>
+                    <a class="flex items-center px-4 py-2 text-sm rounded-md transition-colors text-gray-600 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 hover:text-gray-900 dark:hover:text-white" href="#">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="mr-3 h-5 w-5">
+                            <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
+                            <circle cx="12" cy="12" r="3"></circle>
+                        </svg>
+                        Settings
+                    </a>
+                </nav>
+            </aside>
+            
+            <!-- Main Content -->
+            <div class="flex-1 ml-64">
+                <header class="sticky top-0 z-40 bg-white dark:bg-gray-800 border-b dark:border-gray-700 h-16 flex items-center px-4 justify-between">
+                    <h1 class="text-xl font-semibold dark:text-white">Dashboard</h1>
+                    <button id="theme-toggle" class="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700">
+                        <svg id="theme-toggle-dark-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                        <svg id="theme-toggle-light-icon" class="w-5 h-5 hidden" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 000 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path>
+                        </svg>
+                    </button>
+                </header>
+                
+                <main class="p-4">
+                    <div class="container py-6 animate-fade-in">
+                        <div class="flex justify-between items-center mb-6">
+                            <h1 class="text-3xl font-bold dark:text-white">My Finances</h1>
+                            <button class="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-10 px-4 py-2">
+                                Add Transaction
+                            </button>
+                        </div>
+                        
+                        <!-- Time Period Selector -->
+                        <div class="flex space-x-2 pb-4">
+                            <button id="weekly-btn" class="time-period-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 h-9 rounded-md px-3">
+                                Weekly
+                            </button>
+                            <button id="monthly-btn" class="time-period-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 h-9 rounded-md px-3">
+                                Monthly
+                            </button>
+                            <button id="quarterly-btn" class="time-period-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 h-9 rounded-md px-3">
+                                Quarterly
+                            </button>
+                            <button id="yearly-btn" class="time-period-btn inline-flex items-center justify-center gap-2 whitespace-nowrap text-sm font-medium ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 bg-blue-600 text-white hover:bg-blue-700 h-9 rounded-md px-3">
+                                Yearly
+                            </button>
+                        </div>
+
+
+                        <!-- Summary Cards -->
+                        <div class="grid gap-4 md:grid-cols-3 animate-fade-in">
+                            <!-- Total Income Card -->
+                            <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <h3 class="text-sm font-medium dark:text-gray-300">Total Income</h3>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-finance-positive">
+                                        <path d="m5 12 7-7 7 7"></path>
+                                        <path d="M12 19V5"></path>
+                                    </svg>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-2xl font-bold text-finance-income" id="total-income">$0.00</div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" id="income-period">Yearly earnings</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Total Expenses Card -->
+                            <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <h3 class="text-sm font-medium dark:text-gray-300">Total Expenses</h3>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-finance-negative">
+                                        <path d="M12 5v14"></path>
+                                        <path d="m19 12-7 7-7-7"></path>
+                                    </svg>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-2xl font-bold text-finance-expense" id="total-expense">$0.00</div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" id="expense-period">Yearly spending</p>
+                                </div>
+                            </div>
+                            
+                            <!-- Net Balance Card -->
+                            <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm">
+                                <div class="p-6 flex flex-row items-center justify-between space-y-0 pb-2">
+                                    <h3 class="text-sm font-medium dark:text-gray-300">Net Balance</h3>
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="h-4 w-4 text-finance-positive">
+                                        <path d="m5 12 7-7 7 7"></path>
+                                        <path d="M12 19V5"></path>
+                                    </svg>
+                                </div>
+                                <div class="p-6 pt-0">
+                                    <div class="text-2xl font-bold" id="net-balance">$0.00</div>
+                                    <p class="text-xs text-gray-500 dark:text-gray-400" id="net-period">Profit for yearly period</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Income vs Expenses Chart -->
+                        <div class="grid grid-cols-3 gap-4 mt-6">
+                            <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm col-span-3">
+                                <div class="flex flex-col space-y-1.5 p-6">
+                                    <div class="flex justify-between items-center">
+                                        <h3 class="text-2xl font-semibold leading-none tracking-tight dark:text-white">Income vs. Expenses Over Time</h3>
+                                        <span class="text-sm text-gray-500 dark:text-gray-400" id="time-period-label">Yearly view</span>
+                                    </div>
+                                </div>
+                                <div class="p-6 pt-0 h-[300px]">
+                                    <canvas id="incomeExpenseChart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Net Balance and Expense Categories -->
+                        <div class="grid grid-cols-3 gap-4 mt-6">
+                            <!-- Net Balance Trend -->
+                            <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm col-span-3 md:col-span-2">
+                                <div class="flex flex-col space-y-1.5 p-6">
+                                    <h3 class="text-2xl font-semibold leading-none tracking-tight dark:text-white">Net Balance Trend</h3>
+                                </div>
+                                <div class="p-6 pt-0 h-[300px]">
+                                    <canvas id="netBalanceChart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <!-- Expenses by Category -->
+                            <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm col-span-3 md:col-span-1">
+                                <div class="flex flex-col space-y-1.5 p-6">
+                                    <h3 class="text-2xl font-semibold leading-none tracking-tight dark:text-white">Expenses by Category</h3>
+                                </div>
+                                <div class="p-6 pt-0 h-[300px]">
+                                    <!-- Chart placeholder -->
+                                    <div class="w-full h-full bg-gray-100 dark:bg-gray-700 rounded flex items-center justify-center">
+                                        <p class="text-gray-500 dark:text-gray-400">Expense Categories Pie Chart</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Income vs Expenses Chart -->
+                        <div class="rounded-lg border bg-white dark:bg-gray-800 dark:border-gray-700 shadow-sm mt-6">
+                        <div class="flex flex-col space-y-1.5 p-6">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-2xl font-semibold leading-none tracking-tight dark:text-white">Recent Transactions</h3>
+                                <div class="flex items-center gap-2">
+                                    <select id="transaction-count-select" class="border border-gray-300 dark:border-gray-600 rounded-md px-2 py-1 bg-white dark:bg-gray-800">
+                                        <option value="5">5</option>
+                                        <option value="10">10</option>
+                                        <option value="15">15</option>
+                                    </select>
+                                    <span class="text-sm text-red-500" id="plotting-text">Showing 5 recent transactions</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="p-6 pt-0">
+                            <div class="rounded-md border dark:border-gray-700">
+                                <div class="relative w-full overflow-auto">
+                                    <table class="w-full caption-bottom text-sm">
+                                        <thead>
+                                            <tr class="border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700">
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-gray-500 dark:text-gray-400">Date</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-gray-500 dark:text-gray-400">Description</th>
+                                                <th class="h-12 px-4 text-left align-middle font-medium text-gray-500 dark:text-gray-400">Category</th>
+                                                <th class="h-12 px-4 align-middle font-medium text-gray-500 dark:text-gray-400 text-right">Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody id="transactions-table-body">
+                                            <!-- Transactions will be inserted here by JavaScript -->
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </div>
+
+
+
+    <div id="transaction-modal" class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 hidden">
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow-xl w-full max-w-md p-6">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-xl font-semibold dark:text-white">Add New Transaction</h3>
+                <button id="close-modal" class="text-gray-500 hover:text-gray-700 dark:hover:text-gray-300">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            
+            <p class="text-gray-600 dark:text-gray-300 mb-6">Enter the details of your transaction below</p>
+            
+            <form id="transaction-form" class="space-y-4">
+                <!-- Transaction Type -->
+                <div>
+                    <label for="transaction-type" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Transaction Type</label>
+                    <select id="transaction-type" class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="" disabled selected>Select...</option>
+                        <option value="expense">Expense</option>
+                        <option value="income">Income</option>
+                        <option value="assets">Assets</option>
+                    </select>
+                </div>
+                
+                <!-- Description -->
+                <div>
+                    <label for="transaction-description" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Description</label>
+                    <input type="text" id="transaction-description" placeholder="e.g., Groceries, Salary, etc." 
+                        class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Amount -->
+                <div>
+                    <label for="transaction-amount" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Amount</label>
+                    <input type="number" id="transaction-amount" value="0.00" step="0.01" min="0"
+                        class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Date -->
+                <div>
+                    <label for="transaction-date" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Date</label>
+                    <input type="date" id="transaction-date" 
+                        class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                </div>
+                
+                <!-- Category -->
+                <div>
+                    <label for="transaction-category" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Category</label>
+                    <select id="transaction-category" 
+                            class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                        <option value="other">Other</option>
+                        <option value="food">Food</option>
+                        <option value="transportation">Transportation</option>
+                        <option value="utilities">Utilities</option>
+                        <option value="housing">Housing</option>
+                        <option value="entertainment">Entertainment</option>
+                        <option value="health">Health</option>
+                        <option value="education">Education</option>
+                        <option value="shopping">Shopping</option>
+                        <option value="salary">Salary</option>
+                        <option value="investment">Investment</option>
+                    </select>
+                </div>
+                
+                <div class="flex justify-end space-x-3 pt-4">
+                    <button type="button" id="cancel-transaction" class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600">
+                        Cancel
+                    </button>
+                    <button type="submit" class="px-4 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700">
+                        Add Transaction
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <script>
+        const allTransactions = [
+        // 2025 - May
+        { date: "2025-05-21", description: "Salary payment", category: "income", amount: 2909.00, type: "income" },
+        { date: "2025-05-20", description: "Electricity bill", category: "utilities", amount: 71.00, type: "expense" },
+        { date: "2025-05-18", description: "Groceries", category: "food", amount: 128.45, type: "expense" },
+        { date: "2025-05-15", description: "Stock dividends", category: "income", amount: 140.75, type: "income" },
+        { date: "2025-05-10", description: "Dinner out", category: "food", amount: 56.00, type: "expense" },
+
+        // 2025 - March
+        { date: "2025-03-28", description: "Freelance web dev", category: "income", amount: 900.00, type: "income" },
+        { date: "2025-03-21", description: "Bus pass", category: "transportation", amount: 55.00, type: "expense" },
+        { date: "2025-03-17", description: "Internet subscription", category: "utilities", amount: 60.00, type: "expense" },
+        { date: "2025-03-05", description: "Gym membership", category: "health", amount: 39.99, type: "expense" },
+
+        // 2024 - December
+        { date: "2024-12-25", description: "Christmas gifts", category: "entertainment", amount: 320.00, type: "expense" },
+        { date: "2024-12-20", description: "Year-end bonus", category: "income", amount: 1500.00, type: "income" },
+        { date: "2024-12-10", description: "Taxi fare", category: "transportation", amount: 32.00, type: "expense" },
+        { date: "2024-12-01", description: "Side hustle payment", category: "income", amount: 675.00, type: "income" },
+
+        // 2024 - September
+        { date: "2024-09-15", description: "Monthly salary", category: "income", amount: 2800.00, type: "income" },
+        { date: "2024-09-10", description: "Netflix subscription", category: "entertainment", amount: 19.99, type: "expense" },
+        { date: "2024-09-04", description: "Health checkup", category: "health", amount: 130.00, type: "expense" },
+
+        // 2024 - June
+        { date: "2024-06-29", description: "Rent income", category: "income", amount: 900.00, type: "income" },
+        { date: "2024-06-23", description: "Water bill", category: "utilities", amount: 45.00, type: "expense" },
+        { date: "2024-06-11", description: "New shoes", category: "clothing", amount: 110.00, type: "expense" },
+
+        // 2023 - November
+        { date: "2023-11-19", description: "Client project", category: "income", amount: 1600.00, type: "income" },
+        { date: "2023-11-08", description: "Coffee shop", category: "food", amount: 9.50, type: "expense" },
+        { date: "2023-11-01", description: "Parking fine", category: "transportation", amount: 60.00, type: "expense" },
+
+        // 2023 - July
+        { date: "2023-07-21", description: "Workshop income", category: "income", amount: 780.00, type: "income" },
+        { date: "2023-07-15", description: "Grocery shopping", category: "food", amount: 198.20, type: "expense" },
+        { date: "2023-07-02", description: "Streaming service", category: "entertainment", amount: 13.99, type: "expense" },
+
+        // 2023 - January
+        { date: "2023-01-30", description: "Remote job payment", category: "income", amount: 1000.00, type: "income" },
+        { date: "2023-01-20", description: "Bus pass", category: "transportation", amount: 50.00, type: "expense" },
+        { date: "2023-01-12", description: "Doctor appointment", category: "health", amount: 85.00, type: "expense" }
+        ].sort((a, b) => new Date(b.date) - new Date(a.date));
+
+
+        function renderTransactionsTable(count) {
+            const tableBody = document.getElementById('transactions-table-body');
+            tableBody.innerHTML = '';
+
+            const transactionsToShow = allTransactions.slice(0, count);
+
+            transactionsToShow.forEach(transaction => {
+                const row = document.createElement('tr');
+                row.className = 'border-b dark:border-gray-700 hover:bg-gray-50 dark:hover:bg-gray-700';
+                
+                const amountFormatted = transaction.type === 'income' 
+                    ? `$${transaction.amount.toFixed(2)}` 
+                    : `-$${transaction.amount.toFixed(2)}`;
+                
+                const amountClass = transaction.type === 'income' 
+                    ? 'text-finance-positive' 
+                    : 'text-finance-negative';
+
+                row.innerHTML = `
+                    <td class="p-4 align-middle font-medium dark:text-white">${transaction.date}</td>
+                    <td class="p-4 align-middle dark:text-gray-300">${transaction.description}</td>
+                    <td class="p-4 align-middle capitalize dark:text-gray-300">${transaction.category}</td>
+                    <td class="p-4 align-middle text-right ${amountClass}">${amountFormatted}</td>
+                `;
+                
+                tableBody.appendChild(row);
+            });
+        }
+
+        // Update table when transaction count changes
+        const transactionCountSelect = document.getElementById('transaction-count-select');
+        const plottingText = document.getElementById('plotting-text');
+        
+        function updateTable() {
+            const selectedCount = parseInt(transactionCountSelect.value);
+            plottingText.textContent = `Showing ${selectedCount} recent transactions`;
+            renderTransactionsTable(selectedCount);
+        }
+        
+        transactionCountSelect.addEventListener('change', updateTable);
+        
+        // Initialize with default 10 transactions
+        document.addEventListener('DOMContentLoaded', () => {
+            updateTable();
+            
+            // Initialize Lucide icons (if needed)
+            if (typeof lucide !== 'undefined') {
+                lucide.createIcons();
+            }
+        });
+    </script>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const incomeEl = document.getElementById('total-income');
+            const expenseEl = document.getElementById('total-expense');
+            const netEl = document.getElementById('net-balance');
+            const periodLabelEl = document.getElementById('time-period-label');
+
+            const timePeriods = {
+                weekly: { days: 7, groupBy: 'day', label: 'Weekly' },
+                monthly: { days: 30, groupBy: 'day', label: 'Monthly' },
+                quarterly: { days: 90, groupBy: 'week', label: 'Quarterly' },
+                yearly: { days: 365, groupBy: 'month', label: 'Yearly' }
+            };
+
+            let incomeExpenseChart = null;
+            let currentPeriod = 'yearly';
+            let netBalanceChart = null;
+
+
+            function getWeekNumber(date) {
+                const start = new Date(date.getFullYear(), 0, 1);
+                return Math.floor(((date - start) / (24 * 60 * 60 * 1000) + start.getDay() + 1) / 7);
+            }
+
+            function groupTransactions(transactions, groupBy, cutoffDate) {
+                const grouped = {};
+                for (const t of transactions) {
+                    const date = new Date(t.date);
+                    if (date < cutoffDate) continue;
+
+                    let key;
+                    if (groupBy === 'day') key = t.date;
+                    else if (groupBy === 'week') key = `Week ${getWeekNumber(date)}`;
+                    else key = date.toLocaleString('default', { month: 'short' }) + ' ' + date.getFullYear();
+
+                    if (!grouped[key]) grouped[key] = { income: 0, expense: 0 };
+                    grouped[key][t.type] += t.amount;
+                }
+
+                const labels = Object.keys(grouped).sort((a, b) => {
+                    if (groupBy === 'day') return new Date(a) - new Date(b);
+                    if (groupBy === 'week') return parseInt(a.replace('Week ', '')) - parseInt(b.replace('Week ', ''));
+                    return new Date(a) - new Date(b);
+                });
+
+                return {
+                    labels,
+                    incomeData: labels.map(k => grouped[k].income),
+                    expenseData: labels.map(k => grouped[k].expense)
+                };
+            }
+
+            function updateSummaryCards(transactions) {
+                const income = transactions.filter(t => t.type === 'income').reduce((sum, t) => sum + t.amount, 0);
+                const expense = transactions.filter(t => t.type === 'expense').reduce((sum, t) => sum + t.amount, 0);
+                const net = income - expense;
+
+                incomeEl.textContent = `$${income.toFixed(2)}`;
+                expenseEl.textContent = `$${expense.toFixed(2)}`;
+                netEl.textContent = `$${net.toFixed(2)}`;
+
+                netEl.classList.toggle('text-finance-positive', net >= 0);
+                netEl.classList.toggle('text-finance-negative', net < 0);
+            }
+
+            function updateNetBalanceChart(period) {
+                const config = timePeriods[period];
+                const { startDate, endDate } = config.getRange();
+                
+                // Filter transactions for the period
+                const periodTransactions = allTransactions.filter(t => {
+                    const transDate = new Date(t.date);
+                    return transDate >= startDate && transDate <= endDate;
+                });
+                
+                // Calculate daily net balances
+                const dailyBalances = {};
+                let runningBalance = 0;
+                
+                // Sort transactions chronologically
+                periodTransactions.sort((a, b) => new Date(a.date) - new Date(b.date))
+                    .forEach(t => {
+                        const date = t.date;
+                        if (!dailyBalances[date]) {
+                            dailyBalances[date] = 0;
+                        }
+                        runningBalance += (t.type === 'income' ? t.amount : -t.amount);
+                        dailyBalances[date] = runningBalance;
+                    });
+                
+                // Prepare chart data
+                const labels = Object.keys(dailyBalances).sort((a, b) => new Date(a) - new Date(b));
+                const data = labels.map(date => dailyBalances[date]);
+                
+                // Get chart context
+                const ctx = document.getElementById('netBalanceChart').getContext('2d');
+                
+                // Destroy previous chart if exists
+                if (netBalanceChart) {
+                    netBalanceChart.destroy();
+                }
+                
+                // Create new chart
+                netBalanceChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Net Balance',
+                            data: data,
+                            borderColor: '#3B82F6', // Blue-500
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            tension: 0.3,
+                            fill: true,
+                            pointBackgroundColor: '#ffffff',
+                            pointBorderColor: '#3B82F6',
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        return `Balance: $${context.raw.toFixed(2)}`;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false,
+                                    drawBorder: false
+                                },
+                                ticks: {
+                                    color: '#6B7280' // Gray-500
+                                }
+                            },
+                            y: {
+                                grid: {
+                                    color: 'rgba(209, 213, 219, 0.3)' // Gray-300 with opacity
+                                },
+                                ticks: {
+                                    color: '#6B7280', // Gray-500
+                                    callback: function(value) {
+                                        return '$' + value;
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index'
+                        }
+                    }
+                });
+            }
+
+            function updateChart(transactions, config) {
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - config.days);
+
+                const { labels, incomeData, expenseData } = groupTransactions(transactions, config.groupBy, cutoff);
+                const ctx = document.getElementById('incomeExpenseChart').getContext('2d');
+
+                if (incomeExpenseChart) incomeExpenseChart.destroy();
+
+                incomeExpenseChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [
+                            {
+                                label: 'Income',
+                                data: incomeData,
+                                backgroundColor: '#10B981',
+                                borderColor: '#10B981',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                barPercentage: 0.8
+                            },
+                            {
+                                label: 'Expenses',
+                                data: expenseData,
+                                backgroundColor: '#F43F5E',
+                                borderColor: '#F43F5E',
+                                borderWidth: 1,
+                                borderRadius: 4,
+                                barPercentage: 0.8
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'top',
+                                labels: {
+                                    color: '#6B7280',
+                                    font: { size: 14 },
+                                    usePointStyle: true,
+                                    boxWidth: 8
+                                }
+                            },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                callbacks: {
+                                    label: ctx => `${ctx.dataset.label}: $${ctx.raw.toFixed(2)}`
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false },
+                                ticks: { color: '#6B7280' }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                grid: { color: 'rgba(209,213,219,0.3)' },
+                                ticks: {
+                                    color: '#6B7280',
+                                    callback: val => `$${val}`
+                                }
+                            }
+                        },
+                        interaction: {
+                            mode: 'index',
+                            intersect: false
+                        }
+                    }
+                });
+            }
+
+            function updatePeriod(period) {
+                currentPeriod = period;
+                const config = timePeriods[period];
+
+                const cutoff = new Date();
+                cutoff.setDate(cutoff.getDate() - config.days);
+                const transactions = allTransactions.filter(t => new Date(t.date) >= cutoff);
+
+                updateSummaryCards(transactions);
+                updateChart(transactions, config);
+                periodLabelEl.textContent = `${config.label} View`;
+
+                // Update period labels
+                document.getElementById('income-period').textContent = `${config.label} earnings`;
+                document.getElementById('expense-period').textContent = `${config.label} spending`;
+                document.getElementById('net-period').textContent = `Profit for ${config.label.toLowerCase()} period`;
+
+                // Update button styles
+                document.querySelectorAll('.time-period-btn').forEach(btn => {
+                    btn.classList.remove('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                    btn.classList.add('border', 'border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'hover:bg-gray-50', 'dark:hover:bg-gray-700');
+                });
+
+                const activeBtn = document.getElementById(`${period}-btn`);
+                activeBtn.classList.add('bg-blue-600', 'text-white', 'hover:bg-blue-700');
+                activeBtn.classList.remove('border', 'border-gray-300', 'dark:border-gray-600', 'bg-white', 'dark:bg-gray-800', 'hover:bg-gray-50', 'dark:hover:bg-gray-700');
+            }
+
+            // Bind period buttons
+            Object.keys(timePeriods).forEach(period => {
+                document.getElementById(`${period}-btn`).addEventListener('click', () => updatePeriod(period));
+            });
+
+            // Initial render
+            updatePeriod(currentPeriod);
+        });
+    </script>
+
+
+<script>
+    // Add this to your existing script
+    document.addEventListener('DOMContentLoaded', function() {
+        // Modal elements
+        const modal = document.getElementById('transaction-modal');
+        const openModalBtn = document.querySelector('button[class*="bg-blue-600"]:not(#cancel-transaction)');
+        const closeModalBtn = document.getElementById('close-modal');
+        const cancelBtn = document.getElementById('cancel-transaction');
+        
+        // Form elements
+        const form = document.getElementById('transaction-form');
+        const typeSelect = document.getElementById('transaction-type');
+        const descriptionInput = document.getElementById('transaction-description');
+        const amountInput = document.getElementById('transaction-amount');
+        const dateInput = document.getElementById('transaction-date');
+        const categorySelect = document.getElementById('transaction-category');
+        
+        // Set today's date as default
+        const today = new Date();
+        dateInput.value = today.toISOString().split('T')[0];
+        
+        // Open modal
+        openModalBtn.addEventListener('click', function() {
+            modal.classList.remove('hidden');
+        });
+        
+        // Close modal
+        function closeModal() {
+            modal.classList.add('hidden');
+            form.reset();
+            dateInput.value = today.toISOString().split('T')[0];
+        }
+        
+        closeModalBtn.addEventListener('click', closeModal);
+        cancelBtn.addEventListener('click', closeModal);
+        
+        // Handle form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Create new transaction object
+            const newTransaction = {
+                date: dateInput.value,
+                description: descriptionInput.value,
+                category: categorySelect.value,
+                amount: parseFloat(amountInput.value),
+                type: typeSelect.value
+            };
+            
+            // Add to transactions array
+            allTransactions.unshift(newTransaction);
+            
+            // Re-sort transactions
+            allTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Update UI
+            if (currentPeriod === 'transactions') {
+                renderTransactionsTable(10); // Update table if on transactions view
+            } else {
+                updateDashboard(currentPeriod); // Update dashboard view
+            }
+            
+            // Close modal and reset form
+            closeModal();
+        });
     });
-});
 </script>
-{% endblock %}
+
+
+<style>
+    /* Add these styles to your existing styles */
+    #transaction-modal {
+        transition: opacity 0.3s ease;
+    }
+    
+    #transaction-modal:not(.hidden) {
+        display: flex;
+        opacity: 1;
+    }
+    
+    /* Improve input styling for dark mode */
+    .dark #transaction-type,
+    .dark #transaction-description,
+    .dark #transaction-amount,
+    .dark #transaction-date,
+    .dark #transaction-category {
+        color: #f3f4f6;
+    }
+    
+    /* Style the select dropdown arrow */
+    select {
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 0.5rem center;
+        background-size: 1em;
+    }
+    
+    .dark select {
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23f3f4f6' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+    }
+</style>
+</body>
+</html>

@@ -1,13 +1,42 @@
-{% extends "_base.html" %}
-{% import "bootstrap/wtf.html" as wtf %}
+{% extends "base.html" %}
 
-{% block title %}Register{% endblock %}
+{% block title %}Financial App | Register{% endblock %}
 
 {% block content %}
-  <div class="container">
-    <h2>Register</h2>
-    <form method="POST" action="">
-      {{ wtf.quick_form(form) }}
-    </form>
-  </div>
+    <div class="auth-container">
+        <h2>Create Your Account</h2>
+        <form method="POST" action="{{ url_for('main.register') }}">
+            {{ form.hidden_tag() }}
+
+            <div class="form-row">
+                <div class="form-group half-width">
+                    {{ form.first_name.label }}
+                    {{ form.first_name(class="form-control") }}
+                </div>
+                <div class="form-group half-width">
+                    {{ form.last_name.label }}
+                    {{ form.last_name(class="form-control") }}
+                </div>
+            </div>
+
+            <div class="form-group">
+                {{ form.email.label }}
+                {{ form.email(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.password.label }}
+                {{ form.password(class="form-control") }}
+            </div>
+
+            <div class="form-group">
+                {{ form.password2.label }}
+                {{ form.password2(class="form-control") }}
+            </div>
+
+            {{ form.submit(class="auth-btn") }}
+        </form>
+
+
+    </div>
 {% endblock %}

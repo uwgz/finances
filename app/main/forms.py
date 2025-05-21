@@ -12,8 +12,9 @@ class LoginForm(FlaskForm):
 
 
 class RegistrationForm(FlaskForm):
+    first_name = StringField("First Name", validators=[DataRequired(), Length(1, 64)])
+    last_name = StringField("Last Name", validators=[DataRequired(), Length(1, 64)])
     email = StringField("Email", validators=[DataRequired(), Length(1, 120), Email()])
-    username = StringField("Username", validators=[DataRequired(), Length(1, 64)])
     password = PasswordField(
         "Password",
         validators=[
@@ -27,7 +28,3 @@ class RegistrationForm(FlaskForm):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError("Email already registered.")
-
-    def validate_username(self, field):
-        if User.query.filter_by(username=field.data).first():
-            raise ValidationError("Username already in use.")
