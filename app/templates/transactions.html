@@ -1,0 +1,183 @@
+{% extends "_base.html" %}
+
+{% block title %}Transactions{% endblock %}
+{% block header %}Transactions{% endblock %}
+
+
+{% block extra_css %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/txs.css') }}">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+{% endblock %}
+
+
+{% block content %}
+    <div class="transactions-page">
+        <!-- Recurring Transactions Card -->
+        <div class="transaction-card animate-slide-up">
+            <div class="card-header">
+                <h3>Recurring Transactions</h3>
+                <button id="toggleRecurring" class="view-all-btn">View All</button>
+            </div>
+            <div class="card-content">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Frequency</th>
+                            <th>Next Occurrence</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recurringTransactionsBody">
+                        {% for tx in recurring_transactions %}
+                        <tr class="recurring-item {% if loop.index > 3 %}hidden{% endif %}">
+                            <td>{{ tx.description }}</td>
+                            <td>{{ tx.category }}</td>
+                            <td>{{ tx.frequency }}</td>
+                            <td>{{ tx.date.strftime('%Y-%m-%d') }}</td>
+                            <td class="amount-{{ tx.transaction_type }}">
+                                {% if tx.transaction_type == 'income' %}+{% else %}-{% endif %}{{ "%.2f"|format(tx.amount) }}
+                            </td>
+                            <td>
+                                <button class="edit-btn">Edit</button>
+                                <div class="action-buttons" style="display: none;">
+                                    <button class="delete-btn">Delete</button>
+                                    <button class="cancel-btn">Cancel</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+        <!-- Assets Card -->
+        <div class="transaction-card animate-slide-up">
+            <div class="card-header">
+                <h3>Your assets</h3>
+                <button id="toggleRecurring" class="view-all-btn">View All</button>
+            </div>
+            <div class="card-content">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Frequency</th>
+                            <th>Sold/Bought</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recurringTransactionsBody">
+                        {% for tx in all_assets %}
+                        <tr class="recurring-item {% if loop.index > 3 %}hidden{% endif %}">
+                            <td>{{ tx.description }}</td>
+                            <td>{{ tx.category }}</td>
+                            <td>{{ tx.frequency }}</td>
+                            <td>{{ tx.date.strftime('%Y-%m-%d') }}</td>
+                            <td class="amount-{{ tx.transaction_type }}">
+                                {{ "%.2f"|format(tx.amount) }}
+
+                            </td>
+                            <td>
+                                <button class="edit-btn">Edit</button>
+                                <div class="action-buttons" style="display: none;">
+                                    <button class="delete-btn">Delete</button>
+                                    <button class="cancel-btn">Cancel</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Recent Transactions Card -->
+        <div class="transaction-card animate-slide-up">
+            <div class="card-header">
+                <h3>Recent Transactions</h3>
+                <button class="btn btn-primary" onclick="openTransactionModal()">Add Transaction</button>
+            </div>
+
+            <div class="transaction-controls" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+                <input type="text" class="form-control search-input" placeholder="Search transactions..." style="flex-grow: 1; max-width: 300px;">
+                <div style="display: flex; gap: 10px;">
+                    <div class="filter-dropdown">
+                        <select>
+                            <option>All Categories</option>
+                            <option>Income</option>
+                            <option>Expense</option>
+                            <option>Assets</option>
+                        </select>
+                    </div>
+                    <div class="filter-dropdown">
+                        <select>
+                            <option>All Time</option>
+                            <option>Last Week</option>
+                            <option>Last Month</option>
+                            <option>Last Quarter</option>
+                            <option>Last Year</option>
+                        </select>
+                    </div>
+                    <div class="filter-dropdown">
+                        <select>
+                            <option>Newest First</option>
+                            <option>Oldest First</option>
+                            <option>Highest Amount</option>
+                            <option>Lowest Amount</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-content">
+                <table class="transactions-table">
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Category</th>
+                            <th>Frequency</th>
+                            <th>Date</th>
+                            <th>Amount</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recentTransactionsBody">
+                        {% for txs in all_transactions %}
+                        <tr class="recurring-item {% if loop.index > 3 %}hidden{% endif %}">
+                            <td>{{ txs.description }}</td>
+                            <td>{{ txs.category }}</td>
+                            <td>{{ txs.frequency }}</td>
+                            <td>{{ txs.date.strftime('%Y-%m-%d') }}</td>
+                            <td class="amount-{{ txs.transaction_type }}">
+                                {{ "%+.2f"|format(txs.amount) }}
+                            </td>
+                            <td>
+                                <button class="edit-btn">Edit</button>
+                                <div class="action-buttons hidden">
+                                    <button class="delete-btn">Delete</button>
+                                    <button class="cancel-btn">Cancel</button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="6" style="text-align: center; color: #94a3b8;">No asset transactions found</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </div>
+
+
+    <script src="{{ url_for('static', filename='js/txs.js') }}"></script>
+{% endblock %}

@@ -1,6 +1,7 @@
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
+from wtforms import StringField, SelectField, FloatField, DateField
 from ..models import User
 
 
@@ -28,3 +29,20 @@ class RegistrationForm(FlaskForm):
     def validate_email(self, field):
         if User.query.filter_by(email=field.data).first():
             raise ValidationError("Email already registered.")
+        
+
+class TransactionForm(FlaskForm):
+    transaction_type = SelectField('Transaction Type', choices=[('income', 'Income'), ('expense', 'Expense'), ('assets', 'Assets')], validators=[DataRequired()])
+    amount = FloatField('Amount', validators=[DataRequired()])
+    category = StringField('Category', validators=[DataRequired()])
+    date = DateField('Date', validators=[DataRequired()])
+    frequency = SelectField('Frequency', 
+                          choices=[
+                              ('one-time', 'One-time'),
+                              ('daily', 'Daily'),
+                              ('weekly', 'Weekly'),
+                              ('monthly', 'Monthly'),
+                              ('yearly', 'Yearly')
+                          ], 
+                          validators=[DataRequired()])
+    description = StringField('Description', validators=[DataRequired()])

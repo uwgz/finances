@@ -1,0 +1,56 @@
+<!-- templates/_transaction_modal.html -->
+<div id="transactionModal" class="modal">
+    <div class="modal-content">
+        <span class="close" onclick="closeModal()">&times;</span>
+        <h2>Add New Transaction</h2>
+        <form id="transactionForm" action="{{ url_for('main.dashboard') }}" method="POST">
+            {{ form.hidden_tag() }}
+            <div class="form-group">
+                <label for="transaction_type">Transaction Type</label>
+                <select id="transaction_type" name="transaction_type" required>
+                    <option value="" disabled selected>Select transaction type</option>
+                    <option value="income">Income</option>
+                    <option value="expense">Expense</option>
+                    <option value="assets">Assets</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="amount">Amount</label>
+                <input type="number" id="amount" name="amount" step="0.01" required>
+            </div>
+            
+            <div class="form-group">
+                <label for="category">Category</label>
+                <select id="category" name="category" required>
+                    <option value="" disabled selected>Select category</option>
+                    <!-- Categories will be populated dynamically based on transaction type -->
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="date">Date</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+
+            <div class="form-group">
+                <label for="frequency">Frequency</label>
+                <select id="frequency" name="frequency" required>
+                    <option value="" disabled selected>Select frequency</option>
+                    <option value="one-time">One-time</option>
+                    <option value="daily">Daily</option>
+                    <option value="weekly">Weekly</option>
+                    <option value="monthly">Monthly</option>
+                    <option value="yearly">Yearly</option>
+                </select>
+            </div>
+            
+            <div class="form-group">
+                <label for="description">Description</label>
+                <input type="text" id="description" name="description" required>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Save Transaction</button>
+        </form>
+    </div>
+</div>
