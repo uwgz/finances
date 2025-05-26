@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500&display=swap');
+
+
 :root {
     --finance-income: #0EA5E9;
     --finance-expense: #F43F5E;
@@ -258,9 +261,30 @@ body {
 }
 
 .chart-container {
-    height: 300px;
     position: relative;
+    height: 350px;
+    width: 100%;
+    margin: 0 auto;
 }
+
+canvas {
+    width: 100% !important;
+    height: 100% !important;
+    transition: all 0.3s ease;
+}
+
+#incomeExpenseCanvas {
+    font-family: 'Inter', sans-serif;
+}
+
+.chart-error {
+    padding: 20px;
+    background: #fef2f2;
+    color: #dc2626;
+    border-radius: 4px;
+    text-align: center;
+}
+
 
 /* Transactions table */
 .transactions-table {

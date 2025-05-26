@@ -167,12 +167,71 @@
                 </div>
             </div>
         </div>
+
+        
+        <!-- 3 more charts -->
+        <div class="chart-row animate-fade-in">
+            <!-- Assets Growth -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Assets Growth</h3>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="assetsCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Financial Health -->
+            <div class="card">
+                <div class="card-header">
+                    <h3>Financial Health</h3>
+                </div>
+                <div class="card-content">
+                    <div class="chart-container">
+                        <canvas id="healthCanvas"></canvas>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Cash Flow Forecast -->
+        <div class="card animate-fade-in">
+            <div class="card-header">
+                <h3>6-Month Cash Flow Forecast</h3>
+            </div>
+            <div class="card-content">
+                <div class="chart-container">
+                    <canvas id="forecastCanvas"></canvas>
+                </div>
+            </div>
+        </div>
     </div>
 {% endblock %}
 
-{% block extra_js %}
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+{% block extra_js %}
+    <!-- 1. First set the global transaction data -->
+    <script>
+        window.transactionData = {{ all_tx | tojson | safe }};
+    </script>
+
+    <!-- 2. Load Luxon (date library) FIRST -->
+    <script src="https://cdn.jsdelivr.net/npm/luxon@3.0.1/build/global/luxon.min.js"></script>
+
+    <!-- 3. Then load Chart.js CORE -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.1/dist/chart.min.js"></script>
+
+    <!-- 4. Then load the Luxon adapter for Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-adapter-luxon@1.2.0/dist/chartjs-adapter-luxon.min.js"></script>
+
+    <!-- 5. Now load your custom chart code -->
+    <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+
+    <!-- 6. Other application scripts -->
     <script src="{{ url_for('static', filename='js/models.js') }}"></script>
     {% include '_transaction_modal.html' %}
 {% endblock %}

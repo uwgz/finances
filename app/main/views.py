@@ -44,23 +44,31 @@ def dashboard():
         flash('Transaction added successfully!', 'success')
         return redirect(url_for('main.dashboard'))
     
+    # Get all transactions
     all_tx = Transaction.query.filter(
         Transaction.user_id == current_user.id
     ).order_by(Transaction.date.desc()).all()
     
-    # Summarize totals (keep your existing calculations)
+    # Convert transactions to serializable format
+    tx_data = [{
+        'type': tx.transaction_type,
+        'amount': float(tx.amount),
+        'date': tx.date.isoformat(),
+        'category': tx.category,
+        'description': tx.description,
+        'frequency': tx.frequency
+    } for tx in all_tx]
+
+    # Keep all your existing calculations (unchanged)
     total_income = db.session.query(func.sum(Transaction.amount)).filter_by(
         transaction_type='income', user_id=current_user.id
     ).scalar() or 0.0
-
 
     total_expense = db.session.query(func.sum(Transaction.amount)).filter_by(
         transaction_type='expense', user_id=current_user.id
     ).scalar() or 0.0
 
-
     net_balance = total_income - total_expense
-
 
     assets = db.session.query(func.sum(Transaction.amount)).filter_by(
         transaction_type='assets', user_id=current_user.id
@@ -69,11 +77,8 @@ def dashboard():
     expected_income = db.session.query(
             func.sum(
                 case(
-                    # Daily transactions: amount * remaining days
                     (Transaction.frequency == 'daily', Transaction.amount * days_remaining),
-                    # Weekly transactions: amount * remaining weeks
                     (Transaction.frequency == 'weekly', Transaction.amount * weeks_remaining),
-                    # For monthly/yearly: use amount as-is
                     (Transaction.frequency.in_(['monthly', 'yearly']), Transaction.amount),
                     else_=0.0
                 )
@@ -103,7 +108,6 @@ def dashboard():
             )
         ).scalar() or 0.0
 
-    # Recurring transactions query
     recurring_tx = db.session.query(
         func.sum(
             case(
@@ -138,8 +142,6 @@ def dashboard():
         )
     ).scalar() or 0.0
 
-
-
     return render_template(
         "dashboard.html",
         form=form,
@@ -149,7 +151,7 @@ def dashboard():
         recurring_tx=recurring_tx,
         assets=assets,
         expected_income=expected_income,
-        all_tx = all_tx
+        all_tx=tx_data
     )
 
 
@@ -204,6 +206,22 @@ def register():
 @main.route('/dashboard/feeds/transactions')
 @login_required
 def transactions():
+    form = TransactionForm()
+    if form.validate_on_submit():
+        new_transaction = Transaction(
+            transaction_type=form.transaction_type.data,
+            amount=form.amount.data,
+            category=form.category.data,
+            date=form.date.data,
+            frequency=form.frequency.data,
+            description=form.description.data,
+            user_id=current_user.id
+        )
+        db.session.add(new_transaction)
+        db.session.commit()
+        flash('Transaction added successfully!', 'success')
+        return redirect(url_for('main.transactions'))
+    
     # Get recurring transactions (non one-time)
     recurring_transactions = Transaction.query.filter(
         Transaction.frequency != 'one-time',
@@ -222,6 +240,7 @@ def transactions():
     ).order_by(Transaction.date.desc()).all()
 
     return render_template('transactions.html',
+        form=form,
         recurring_transactions=recurring_transactions,
         all_transactions=all_tx,
         all_assets=all_assets
