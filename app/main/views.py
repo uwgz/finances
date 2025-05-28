@@ -1,15 +1,16 @@
-from flask import flash, redirect, render_template, url_for, request
+from flask import flash, redirect, render_template, url_for, request, jsonify
 from flask_login import login_required, login_user, logout_user, current_user
 from werkzeug.security import check_password_hash
 from datetime import datetime
+import json
 from . import main
 from .. import db
 from ..models import User, Transaction
 from .forms import LoginForm, RegistrationForm, TransactionForm
-from sqlalchemy import func, extract, case, and_, or_
-from datetime import datetime, timedelta
+from sqlalchemy import func, extract, case
+from datetime import datetime
 from dateutil.relativedelta import relativedelta
-
+from ..utils import FinancialGoalOptimizer
 
 
 @main.route("/")
@@ -246,20 +247,6 @@ def transactions():
         all_assets=all_assets
     )
 
-# Analysis routes
-@main.route('/dashboard/feeds/analysis', methods=['GET', 'POST'])
-def analysis():
-    if request.method == 'POST':
-        # Handle form submission for analysis
-        # Example: Update analysis filters
-        # start_date = request.form.get('start_date')
-        # end_date = request.form.get('end_date')
-        # Process the filters
-        return redirect(url_for('analysis'))
-    
-    # GET request - show analysis
-    return render_template('analysis.html')
-
 # Settings routes
 @main.route('/dashboard/feeds/settings', methods=['GET', 'POST'])
 def settings():
@@ -273,3 +260,119 @@ def settings():
     
     # GET request - show settings
     return render_template('settings.html')
+
+
+
+
+# Prediction settings
+@main.route('/dashboard/feeds/predictor', methods=['GET', 'POST'])
+def predictor():
+    if request.method == 'POST':
+        try:
+            data = request.get_json()
+            print(data)
+            if not data or 'goal_name' not in data or 'goal_amount' not in data or 'transactions' not in data:
+                return jsonify({'status': 'error', 'message': 'Invalid data format'}), 400
+            
+            print("Received goal data:", data['transactions'])
+            
+            
+            # Prepare the transactions data for the optimizer
+            transactions = prepare_transactions_data(data['transactions'])
+
+            print("*"*1000)
+           
+            goal_amount = data['goal_amount']
+
+
+
+            # Create and use the optimizer
+            optimizer = FinancialGoalOptimizer(transactions)
+            optimal_years = optimizer.find_optimal_years(goal_amount)
+            projected_savings = optimizer.calculate_total_net(optimal_years)
+            
+            # return jsonify({
+            #     'status': 'success',
+            #     'goal_name': data['goal_name'],
+            #     'goal_amount': goal_amount,
+            #     'optimal_years': optimal_years,
+            #     'projected_savings': projected_savings,
+            #     'monthly_savings_needed': goal_amount / (optimal_years * 12) if optimal_years > 0 else 0,
+            #     'annual_savings_needed': goal_amount / optimal_years if optimal_years > 0 else 0,
+            #     'transactions_summary': {
+            #         'total_income': sum(sum(amounts) for amounts in optimizer.transactions['income'].values()),
+            #         'total_expenses': sum(sum(amounts) for amounts in optimizer.transactions['expenses'].values())
+            #     }
+            # })
+            
+        except Exception as e:
+            return jsonify({'status': 'error', 'message': str(e)}), 500
+    
+    # Get all recurring transactions EXCLUDING assets
+    all_tx = Transaction.query.filter(
+        Transaction.user_id == current_user.id,
+        Transaction.frequency != 'one-time',
+        Transaction.transaction_type != 'assets'  # Explicitly exclude assets
+    ).order_by(Transaction.date.desc()).all()
+    
+    # Convert transactions to serializable format
+    tx_data = [{
+        'transaction_type': tx.transaction_type,
+        'amount': float(tx.amount),
+        'date': tx.date.isoformat(),
+        'category': tx.category,
+        'description': tx.description,
+        'frequency': tx.frequency
+    } for tx in all_tx]
+
+
+    # Calculate totals (also excluding assets)
+    total_income = db.session.query(func.sum(Transaction.amount)).filter(
+        Transaction.transaction_type == 'income',
+        Transaction.user_id == current_user.id,
+        Transaction.transaction_type != 'assets'
+    ).scalar() or 0.0
+
+    total_expense = db.session.query(func.sum(Transaction.amount)).filter(
+        Transaction.transaction_type == 'expense', 
+        Transaction.user_id == current_user.id,
+        Transaction.transaction_type != 'assets'
+    ).scalar() or 0.0
+
+    net_balance = total_income - total_expense
+
+
+    return render_template('predictor.html',
+        transactions=json.dumps(tx_data),
+        total_income=total_income,
+        total_expense=total_expense,
+        net_balance=net_balance
+    )
+
+
+
+def prepare_transactions_data(raw_transactions):
+    transactions = {
+        "income": {
+            "daily": [],
+            "weekly": [],
+            "monthly": [],
+            "yearly": []
+        },
+        "expenses": {
+            "daily": [],
+            "weekly": [],
+            "monthly": [],
+            "yearly": []
+        }
+    }
+    
+    for tx in raw_transactions:
+        tx_type = tx['transaction_type']  # 'income' or 'expense'
+        frequency = tx['frequency']  # 'daily', 'weekly', 'monthly', 'yearly'
+        amount = tx['amount']
+        
+        # Append the amount to the appropriate list
+        transactions[tx_type][frequency].append(amount)
+    
+    return transactions

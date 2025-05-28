@@ -1,0 +1,110 @@
+{% extends "_base.html" %}
+
+{% block title %}Financial Predictor{% endblock %}
+
+{% block extra_css %}
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/predict.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="content">
+    <div class="summary-cards animate-fade-in">
+        <!-- Total Income Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="summary-header">
+                    <h3>Total Income</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0EA5E9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m5 12 7-7 7 7"></path>
+                        <path d="M12 19V5"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="summary-value income">${{ '{:,.2f}'.format(total_income or 0.0) }}</div>
+                <p class="summary-description">Yearly earnings</p>
+            </div>
+        </div>
+
+        <!-- Total Expenses Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="summary-header">
+                    <h3>Total Expenses</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F43F5E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 5v14"></path>
+                        <path d="m19 12-7 7-7-7"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="summary-value expense">${{ '{:,.2f}'.format(total_expense or 0.0) }}</div>
+                <p class="summary-description">Yearly spending</p>
+            </div>
+        </div>
+
+        <!-- Net Balance Card -->
+        <div class="card">
+            <div class="card-header">
+                <div class="summary-header">
+                    <h3>Net Balance</h3>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#10B981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="m5 12 7-7 7 7"></path>
+                        <path d="M12 19V5"></path>
+                    </svg>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="summary-value positive">${{ '{:,.2f}'.format(net_balance or 0.0) }}</div>
+                <p class="summary-description">Profit for yearly period</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Improved Savings Goal Card -->
+    <div class="savings-goal-card">
+        <div class="goal-card-header">
+            <div class="goal-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#3B82F6" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 2v4"></path>
+                    <path d="m18 6-4 4"></path>
+                    <path d="m6 6 4 4"></path>
+                    <path d="M4 13.5V16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2.5"></path>
+                    <path d="M12 20v-2"></path>
+                </svg>
+            </div>
+            <div class="goal-title">
+                <h2>Create Savings Goal</h2>
+                <p>Set your financial target and track your progress</p>
+            </div>
+        </div>
+        <div class="goal-card-body">
+            <form id="goal-form">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="goal-name">Goal Name</label>
+                        <input type="text" id="goal-name" placeholder="e.g., Vacation, New Car" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="goal-amount">Amount Needed ($)</label>
+                        <input type="number" id="goal-amount" min="0" step="0.01" placeholder="5000.00" required>
+                    </div>
+                </div>
+                <button type="submit" class="goal-submit-btn">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M5 12h14"></path>
+                        <path d="M12 5v14"></path>
+                    </svg>
+                    Create Goal
+                </button>
+
+                <input type="hidden" id="transactions-data" value="{{ transactions }}">
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{{ url_for('static', filename='js/predict.js') }}"></script>
+{% endblock %}
