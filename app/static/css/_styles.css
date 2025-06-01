@@ -37,6 +37,26 @@ body {
     position: fixed;
     height: 100vh;
     padding: 1rem 0;
+    transition: width 0.3s ease;
+    z-index: 100; /* Ensure sidebar is above other content */
+    overflow-y: auto; /* Allow scrolling if content exceeds height */
+}
+
+.sidebar.collapsed {
+    width: 70px; /* Width when collapsed */
+}
+
+.sidebar.collapsed .sidebar-logo span,
+.sidebar.collapsed .nav-item span {
+    display: none; /* Hide text when collapsed */
+}
+
+.sidebar.collapsed .sidebar-logo svg {
+    margin-right: 0; /* Adjust icon margin when collapsed */
+}
+
+.sidebar.collapsed .nav-item {
+    justify-content: center; /* Center icons when collapsed */
 }
 
 .sidebar-header {
@@ -44,6 +64,7 @@ body {
     align-items: center;
     padding: 0 1rem 1rem;
     border-bottom: 1px solid var(--border-color);
+    justify-content: space-between; /* For logo and toggle button */
 }
 
 .sidebar-logo {
@@ -52,6 +73,8 @@ body {
     font-size: 1.25rem;
     font-weight: 600;
     color: var(--text-primary);
+    white-space: nowrap; /* Prevent logo text from wrapping */
+    overflow: hidden; /* Hide overflowing text during transition */
 }
 
 .sidebar-logo svg {
@@ -95,6 +118,11 @@ body {
 .main-content {
     flex: 1;
     margin-left: 256px;
+    transition: margin-left 0.3s ease;
+}
+
+.main-content.collapsed {
+    margin-left: 70px; /* Adjust margin when sidebar is collapsed */
 }
 
 .header {
@@ -107,6 +135,7 @@ body {
     align-items: center;
     padding: 0 1rem;
     z-index: 10;
+    order: 1 !important; /* Ensures icon comes after name */
 }
 
 .header h1 {
@@ -575,4 +604,42 @@ canvas {
 
 .avatar-link:hover {
     transform: scale(1.05);
+}
+
+/* Sidebar Toggle Button */
+.sidebar-toggle {
+    display: none; /* Hidden by default, shown on smaller screens */
+    background: none;
+    border: none;
+    color: var(--text-primary);
+    cursor: pointer;
+    padding: 0.5rem;
+}
+
+.sidebar-toggle svg {
+    width: 24px;
+    height: 24px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .sidebar {
+        width: 0; /* Collapsed by default on small screens */
+        overflow: hidden;
+    }
+    .sidebar.open {
+        width: 256px; /* Full width when opened */
+    }
+    .main-content {
+        margin-left: 0;
+    }
+    .main-content.shifted {
+        margin-left: 256px; /* Shift content when sidebar is open */
+    }
+    .sidebar-toggle {
+        display: block; /* Show toggle button */
+    }
+    .sidebar-header .sidebar-logo {
+        /* Optionally hide logo text or full logo on very small screens if toggle takes space */
+    }
 }

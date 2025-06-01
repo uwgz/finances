@@ -1,0 +1,752 @@
+{% extends "_base.html" %}
+
+{% block title %}Goal Forecast Results{% endblock %}
+
+{% block header %}Goal Forecast Results{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #2563eb;
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #06b6d4;
+        --light-gray: #f8fafc;
+        --medium-gray: #e2e8f0;
+        --dark-gray: #64748b;
+        --text-primary: #1e293b;
+        --text-secondary: #64748b;
+        --border-radius: 12px;
+        --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+        --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+        --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+    }
+
+    .forecast-container {
+        max-width: 1400px;
+        margin: 0 auto;
+        padding: 2rem 1rem;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        min-height: 100vh;
+    }
+
+    .goal-header {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        border-radius: var(--border-radius);
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: var(--shadow-lg);
+        color: white;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .goal-header::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 100px;
+        height: 100px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 50%;
+        transform: translate(30px, -30px);
+    }
+
+    .goal-header h2 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .goal-header .goal-icon {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.75rem;
+        border-radius: 50%;
+        font-size: 1.5rem;
+    }
+
+    .card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        border: none;
+        margin-bottom: 2rem;
+        overflow: hidden;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .card-header {
+        background: var(--light-gray);
+        border-bottom: 1px solid var(--medium-gray);
+        padding: 1.5rem;
+        border-radius: var(--border-radius) var(--border-radius) 0 0;
+    }
+
+    .card-header h4, .card-header h5 {
+        margin: 0;
+        color: var(--text-primary);
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    .status-alert {
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        border: none;
+        margin-bottom: 1.5rem;
+    }
+
+    .alert-success {
+        background: linear-gradient(135deg, #d1fae5, #a7f3d0);
+        color: #065f46;
+        border-left: 4px solid var(--success-color);
+    }
+
+    .alert-warning {
+        background: linear-gradient(135deg, #fef3c7, #fde68a);
+        color: #92400e;
+        border-left: 4px solid var(--warning-color);
+    }
+
+    .alert-info {
+        background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+        color: #1e40af;
+        border-left: 4px solid var(--info-color);
+    }
+
+    .metric-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 2rem;
+        margin: 2rem 0;
+    }
+
+    .metric-card {
+        text-align: center;
+        padding: 1.5rem;
+        background: var(--light-gray);
+        border-radius: var(--border-radius);
+        border-left: 4px solid var(--primary-color);
+        transition: all 0.3s ease;
+    }
+
+    .metric-card:hover {
+        background: #e0f2fe;
+        transform: translateY(-2px);
+    }
+
+    .metric-card h5 {
+        color: var(--text-secondary);
+        font-size: 0.9rem;
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .metric-card h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+    }
+
+    .metric-card .text-info { color: var(--info-color) !important; }
+    .metric-card .text-warning { color: var(--warning-color) !important; }
+    .metric-card .text-success { color: var(--success-color) !important; }
+
+    .milestone-item {
+        display: flex;
+        justify-content: between;
+        align-items: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: var(--light-gray);
+        border-radius: var(--border-radius);
+        transition: all 0.3s ease;
+    }
+
+    .milestone-item:hover {
+        background: #f1f5f9;
+        transform: translateX(4px);
+    }
+
+    .milestone-info h6 {
+        margin: 0 0 0.25rem 0;
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .milestone-progress {
+        width: 200px;
+        height: 8px;
+        background: var(--medium-gray);
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    .milestone-progress-bar {
+        height: 100%;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+    }
+
+    .milestone-progress-bar.achieved {
+        background: linear-gradient(90deg, var(--success-color), #059669);
+    }
+
+    .milestone-progress-bar.pending {
+        background: linear-gradient(90deg, var(--info-color), #0891b2);
+    }
+
+    .scenario-form {
+        background: var(--light-gray);
+        padding: 1.5rem;
+        border-radius: var(--border-radius);
+        margin-bottom: 1rem;
+    }
+
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        display: block;
+        margin-bottom: 0.5rem;
+        font-weight: 500;
+        color: var(--text-primary);
+    }
+
+    .form-control {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        border: 2px solid var(--medium-gray);
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .form-control:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        font-weight: 500;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: all 0.3s ease;
+        cursor: pointer;
+        border: none;
+        font-size: 0.95rem;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), #3b82f6);
+        color: white;
+    }
+
+    .btn-primary:hover {
+        background: linear-gradient(135deg, #1d4ed8, #2563eb);
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-md);
+    }
+
+    .btn-secondary {
+        background: var(--medium-gray);
+        color: var(--text-primary);
+    }
+
+    .btn-secondary:hover {
+        background: var(--dark-gray);
+        color: white;
+    }
+
+    .btn-success {
+        background: linear-gradient(135deg, var(--success-color), #059669);
+        color: white;
+    }
+
+    .btn-outline-primary {
+        background: transparent;
+        color: var(--primary-color);
+        border: 2px solid var(--primary-color);
+    }
+
+    .btn-outline-primary:hover {
+        background: var(--primary-color);
+        color: white;
+    }
+
+    .sidebar-stats {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 2rem;
+    }
+
+    .stat-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 1rem;
+        border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .stat-item:last-child {
+        border-bottom: none;
+    }
+
+    .stat-label {
+        font-weight: 500;
+        color: var(--text-secondary);
+    }
+
+    .stat-value {
+        font-weight: 600;
+        color: var(--text-primary);
+    }
+
+    .stat-value.positive {
+        color: var(--success-color);
+    }
+
+    .stat-value.negative {
+        color: var(--danger-color);
+    }
+
+    .suggestion-card {
+        padding: 1rem;
+        margin-bottom: 1rem;
+        border-radius: var(--border-radius);
+        border-left: 4px solid;
+    }
+
+    .suggestion-card.critical {
+        background: #fef2f2;
+        border-left-color: var(--danger-color);
+        color: #7f1d1d;
+    }
+
+    .suggestion-card.optimization {
+        background: #fffbeb;
+        border-left-color: var(--warning-color);
+        color: #78350f;
+    }
+
+    .suggestion-card.info {
+        background: #f0f9ff;
+        border-left-color: var(--info-color);
+        color: #0c4a6e;
+    }
+
+    .suggestion-title {
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .spending-category {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid var(--medium-gray);
+    }
+
+    .spending-category:last-child {
+        border-bottom: none;
+    }
+
+    .category-badge {
+        background: var(--primary-color);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.85rem;
+        font-weight: 500;
+    }
+
+    .action-buttons {
+        text-align: center;
+        padding: 2rem 0;
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--shadow-md);
+        margin-top: 2rem;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        margin-top: 1rem;
+    }
+
+    .badge {
+        padding: 0.375rem 0.75rem;
+        border-radius: 6px;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+
+    .badge.success {
+        background: #dcfce7;
+        color: #166534;
+    }
+
+    @media (max-width: 768px) {
+        .forecast-container {
+            padding: 1rem;
+        }
+
+        .goal-header {
+            padding: 1.5rem;
+        }
+
+        .goal-header h2 {
+            font-size: 1.5rem;
+        }
+
+        .metric-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .milestone-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .milestone-progress {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="forecast-container">
+    <!-- Goal Header -->
+    <div class="goal-header">
+        <h2>
+            <span class="goal-icon">
+                <i class="fas fa-target"></i>
+            </span>
+            {{ goal_info.type.replace('_', ' ').title() }} Goal: ${{ "%.2f"|format(goal_info.amount) }}
+        </h2>
+        {% if goal_info.description %}
+        <p style="margin: 1rem 0 0 0; opacity: 0.9; font-size: 1.1rem;">{{ goal_info.description }}</p>
+        {% endif %}
+    </div>
+
+    <div style="display: grid; grid-template-columns: 1fr 350px; gap: 2rem; align-items: start;">
+        <!-- Main Content -->
+        <div>
+            <!-- Forecast Summary -->
+            <div class="card">
+                <div class="card-header">
+                    <h4>
+                        {% if forecast.goal_achieved %}
+                            <i class="fas fa-check-circle" style="color: var(--success-color);"></i> Goal Already Achieved!
+                        {% elif forecast.achievable %}
+                            <i class="fas fa-clock" style="color: var(--info-color);"></i> Forecast Summary
+                        {% else %}
+                            <i class="fas fa-exclamation-triangle" style="color: var(--warning-color);"></i> Goal Currently Not Achievable
+                        {% endif %}
+                    </h4>
+                </div>
+                <div class="card-body">
+                    {% if forecast.goal_achieved %}
+                        <div class="status-alert alert-success">
+                            <h5 style="margin-bottom: 1rem;">🎉 Congratulations! You've already achieved this goal!</h5>
+                            <p style="margin: 0;">Your current balance of ${{ "%.2f"|format(forecast.current_balance) }} exceeds your goal by ${{ "%.2f"|format(forecast.surplus) }}.</p>
+                        </div>
+                    {% elif forecast.achievable %}
+                        <div class="metric-grid">
+                            <div class="metric-card">
+                                <h5>Target Date</h5>
+                                <h3 class="text-info">{{ forecast.achievement_date.strftime('%b %Y') }}</h3>
+                            </div>
+                            <div class="metric-card">
+                                <h5>Amount Needed</h5>
+                                <h3 class="text-warning">${{ "%.2f"|format(forecast.amount_needed) }}</h3>
+                            </div>
+                            <div class="metric-card">
+                                <h5>Monthly Savings</h5>
+                                <h3 class="text-success">${{ "%.2f"|format(forecast.cash_flow_analysis.net_monthly_flow) }}</h3>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="status-alert alert-warning">
+                            <h5 style="margin-bottom: 1rem;">⚠️ Goal Currently Not Achievable</h5>
+                            <p style="margin-bottom: 1rem;">Your current monthly expenses exceed your income by ${{ "%.2f"|format(forecast.monthly_deficit) }}.</p>
+                            <p style="margin: 0;"><strong>Recommendation:</strong> {{ forecast.recommendation }}</p>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Milestones Progress -->
+            {% if forecast.achievable and not forecast.goal_achieved %}
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-road"></i> Goal Milestones</h4>
+                </div>
+                <div class="card-body">
+                    {% for milestone in milestones %}
+                    <div class="milestone-item">
+                        <div class="milestone-info">
+                            <h6>{{ milestone.percentage }}% - ${{ "%.2f"|format(milestone.amount) }}</h6>
+                            {% if milestone.achieved %}
+                                <span class="badge success">✓ Achieved</span>
+                            {% else %}
+                                <small style="color: var(--text-secondary);">Target: {{ milestone.achievement_date.strftime('%b %d, %Y') }}</small>
+                            {% endif %}
+                        </div>
+                        <div class="milestone-progress">
+                            <div class="milestone-progress-bar {% if milestone.achieved %}achieved{% else %}pending{% endif %}" 
+                                 style="width: {{ milestone.percentage }}%"></div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Scenario Analysis -->
+            <div class="card">
+                <div class="card-header">
+                    <h4><i class="fas fa-calculator"></i> What-If Scenarios</h4>
+                </div>
+                <div class="card-body">
+                    <div class="scenario-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem;">
+                            <div class="form-group">
+                                <label class="form-label">Additional Monthly Income ($)</label>
+                                <input type="number" class="form-control" id="additionalIncome" step="0.01" min="0" value="0">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Reduced Monthly Expenses ($)</label>
+                                <input type="number" class="form-control" id="reducedExpenses" step="0.01" min="0" value="0">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-outline-primary" id="calculateScenario">
+                            <i class="fas fa-chart-line"></i> Calculate Impact
+                        </button>
+                    </div>
+                    
+                    <div id="scenarioResults" style="display: none;">
+                        <div class="status-alert alert-info">
+                            <h6 style="margin-bottom: 1rem;">📊 Scenario Results:</h6>
+                            <div id="scenarioContent"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar -->
+        <div>
+            <!-- Current Status -->
+            <div class="sidebar-stats">
+                <div class="card-header">
+                    <h5>💰 Current Financial Status</h5>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                    <div class="stat-item">
+                        <span class="stat-label">Current Balance:</span>
+                        <span class="stat-value">${{ "%.2f"|format(forecast.current_balance) }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Monthly Income:</span>
+                        <span class="stat-value positive">${{ "%.2f"|format(forecast.cash_flow_analysis.monthly_income) }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Monthly Expenses:</span>
+                        <span class="stat-value negative">${{ "%.2f"|format(forecast.cash_flow_analysis.monthly_expenses) }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Net Monthly Savings:</span>
+                        <span class="stat-value {{ 'positive' if forecast.cash_flow_analysis.net_monthly_flow > 0 else 'negative' }}">
+                            ${{ "%.2f"|format(forecast.cash_flow_analysis.net_monthly_flow) }}
+                        </span>
+                    </div>
+                    {% if forecast.achievable and not forecast.goal_achieved %}
+                    <div class="stat-item">
+                        <span class="stat-label">Weekly Savings:</span>
+                        <span class="stat-value">${{ "%.2f"|format(forecast.weekly_savings) }}</span>
+                    </div>
+                    <div class="stat-item">
+                        <span class="stat-label">Daily Savings:</span>
+                        <span class="stat-value">${{ "%.2f"|format(forecast.daily_savings) }}</span>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Optimization Suggestions -->
+            {% if suggestions %}
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-lightbulb"></i> Optimization Tips</h5>
+                </div>
+                <div class="card-body">
+                    {% for suggestion in suggestions %}
+                    <div class="suggestion-card {{ suggestion.type }}">
+                        <div class="suggestion-title">{{ suggestion.title }}</div>
+                        <div style="font-size: 0.9rem; margin-bottom: 0.5rem;">{{ suggestion.description }}</div>
+                        {% if suggestion.potential_savings %}
+                        <div style="font-size: 0.85rem; font-weight: 600; color: var(--success-color);">
+                            💡 Potential savings: ${{ "%.2f"|format(suggestion.potential_savings) }}/month
+                        </div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            <!-- Spending Analysis -->
+            {% if spending_analysis %}
+            <div class="card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-pie"></i> Top Spending Categories</h5>
+                </div>
+                <div class="card-body">
+                    {% for category in spending_analysis[:5] %}
+                    <div class="spending-category">
+                        <span>{{ category.category }}</span>
+                        <span class="category-badge">${{ "%.2f"|format(category.total_amount) }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="chart-container">
+                        <canvas id="spendingChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+        <a href="{{ url_for('main.forecast') }}" class="btn btn-secondary">
+            <i class="fas fa-arrow-left"></i> Set New Goal
+        </a>
+        <a href="{{ url_for('main.forecast_dashboard') }}" class="btn btn-primary">
+            <i class="fas fa-dashboard"></i> Forecast Dashboard
+        </a>
+        <button class="btn btn-success" onclick="window.print()">
+            <i class="fas fa-print"></i> Print Report
+        </button>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Scenario calculation
+    document.getElementById('calculateScenario').addEventListener('click', function() {
+        const additionalIncome = parseFloat(document.getElementById('additionalIncome').value) || 0;
+        const reducedExpenses = parseFloat(document.getElementById('reducedExpenses').value) || 0;
+        
+        fetch('/forecast/api/scenario', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                goal_amount: {{ goal_info.amount }},
+                additional_income: additionalIncome,
+                reduced_expenses: reducedExpenses
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            const resultsDiv = document.getElementById('scenarioResults');
+            const contentDiv = document.getElementById('scenarioContent');
+            
+            if (data.achievable) {
+                contentDiv.innerHTML = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        <div><strong>New Timeline:</strong> ${data.adjusted_months} months</div>
+                        <div><strong>New Target Date:</strong> ${new Date(data.adjusted_date).toLocaleDateString()}</div>
+                        <div><strong>Time Saved:</strong> ${data.time_saved_months} months</div>
+                        <div><strong>New Monthly Savings:</strong> $${data.adjusted_monthly_flow.toFixed(2)}</div>
+                    </div>
+                `;
+            } else {
+                contentDiv.innerHTML = `<p style="color: var(--danger-color); margin: 0;">${data.message || 'Goal still not achievable with these adjustments'}</p>`;
+            }
+            
+            resultsDiv.style.display = 'block';
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+
+    // Spending chart
+    {% if spending_analysis %}
+    const ctx = document.getElementById('spendingChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: [{% for category in spending_analysis[:5] %}'{{ category.category }}'{% if not loop.last %},{% endif %}{% endfor %}],
+            datasets: [{
+                data: [{% for category in spending_analysis[:5] %}{{ category.total_amount }}{% if not loop.last %},{% endif %}{% endfor %}],
+                backgroundColor: [
+                    '#2563eb',
+                    '#10b981',
+                    '#f59e0b',
+                    '#ef4444',
+                    '#8b5cf6'
+                ],
+                borderWidth: 0
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: {
+                        padding: 15,
+                        usePointStyle: true,
+                        font: {
+                            size: 12
+                        }
+                    }
+                }
+            }
+        }
+    });
+    {% endif %}
+</script>
+{% endblock %}

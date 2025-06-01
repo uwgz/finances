@@ -1,0 +1,767 @@
+{% extends "_base.html" %}
+
+{% block title %}Financial Forecast Dashboard{% endblock %}
+
+{% block header %}
+    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 0.5rem; vertical-align: middle;">
+        <path d="M3 3v18h18"></path>
+        <path d="m19 9-5 5-4-4-3 3"></path>
+    </svg>
+    Financial Forecast Dashboard
+{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #667eea;
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-color: #10b981;
+        --success-gradient: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        --warning-color: #f59e0b;
+        --warning-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+        --danger-color: #ef4444;
+        --danger-gradient: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        --info-color: #3b82f6;
+        --info-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+        --light-bg: #f8fafc;
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+        --border-radius: 12px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .content {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .dashboard-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    /* Key Metrics Cards */
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: var(--card-shadow);
+        border: none;
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+        color: white;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        opacity: 0.9;
+        z-index: 1;
+    }
+
+    .metric-card.primary::before {
+        background: var(--primary-gradient);
+    }
+
+    .metric-card.success::before {
+        background: var(--success-gradient);
+    }
+
+    .metric-card.danger::before {
+        background: var(--danger-gradient);
+    }
+
+    .metric-card.info::before {
+        background: var(--info-gradient);
+    }
+
+    .metric-card.warning::before {
+        background: var(--warning-gradient);
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .metric-card:hover::before {
+        opacity: 1;
+    }
+
+    .metric-content {
+        position: relative;
+        z-index: 2;
+        text-align: center;
+    }
+
+    .metric-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+        margin-bottom: 0.75rem;
+        opacity: 0.9;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Main Content Grid */
+    .content-grid {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .main-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+        transition: var(--transition);
+    }
+
+    .main-card:hover {
+        box-shadow: var(--card-shadow-hover);
+    }
+
+    .card-header-custom {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 1.5rem;
+        border-bottom: 1px solid #e2e8f0;
+        position: relative;
+    }
+
+    .card-header-title {
+        margin: 0;
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: #1f2937;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .header-icon {
+        width: 2rem;
+        height: 2rem;
+        background: var(--primary-gradient);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+    }
+
+    .card-body-custom {
+        padding: 1.5rem;
+    }
+
+    /* Table Styling */
+    .forecast-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    .forecast-table th {
+        background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+        padding: 1rem;
+        text-align: left;
+        font-weight: 600;
+        color: #374151;
+        border-bottom: 2px solid #e5e7eb;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .forecast-table td {
+        padding: 1rem;
+        border-bottom: 1px solid #f3f4f6;
+        transition: var(--transition);
+    }
+
+    .forecast-table tr:hover td {
+        background-color: #f8fafc;
+    }
+
+    .amount-cell {
+        font-weight: 700;
+        color: var(--primary-color);
+        font-size: 1.125rem;
+    }
+
+    .months-cell {
+        color: #6b7280;
+        font-weight: 500;
+    }
+
+    .date-cell {
+        color: #374151;
+        font-weight: 500;
+    }
+
+    .action-btn {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-block;
+    }
+
+    .action-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Alert Styling */
+    .alert-custom {
+        background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+        border: 1px solid #93c5fd;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        color: #1e40af;
+    }
+
+    .alert-custom ul {
+        margin-bottom: 0;
+        padding-left: 1.5rem;
+    }
+
+    .alert-custom li {
+        margin-bottom: 0.5rem;
+    }
+
+    /* Spending Analysis */
+    .spending-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .spending-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 0;
+        border-bottom: 1px solid #f3f4f6;
+        transition: var(--transition);
+    }
+
+    .spending-item:last-child {
+        border-bottom: none;
+    }
+
+    .spending-item:hover {
+        background-color: #f8fafc;
+        margin: 0 -1rem;
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    .spending-category {
+        font-weight: 500;
+        color: #374151;
+    }
+
+    .spending-badge {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 0.25rem 0.75rem;
+        border-radius: 20px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        margin-top: 1rem;
+    }
+
+    /* Action Buttons */
+    .action-section {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        padding: 2rem;
+        text-align: center;
+        margin-top: 2rem;
+    }
+
+    .action-btn-large {
+        background: var(--primary-gradient);
+        color: white;
+        border: none;
+        padding: 1rem 2rem;
+        border-radius: 8px;
+        font-size: 1.125rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        text-decoration: none;
+        transition: var(--transition);
+        display: inline-block;
+        margin: 0 0.75rem;
+    }
+
+    .action-btn-large:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        color: white;
+        text-decoration: none;
+    }
+
+    .action-btn-secondary {
+        background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%);
+    }
+
+    .action-btn-secondary:hover {
+        box-shadow: 0 10px 25px rgba(107, 114, 128, 0.3);
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    @keyframes fadeIn {
+        from {
+            opacity: 0;
+        }
+        to {
+            opacity: 1;
+        }
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .animate-fade-in {
+        animation: fadeIn 0.8s ease-out;
+    }
+
+    .animate-slide-up:nth-child(1) { animation-delay: 0s; }
+    .animate-slide-up:nth-child(2) { animation-delay: 0.1s; }
+    .animate-slide-up:nth-child(3) { animation-delay: 0.2s; }
+    .animate-slide-up:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Responsive Design */
+    @media (max-width: 1024px) {
+        .content-grid {
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .dashboard-container {
+            padding: 0 0.5rem;
+        }
+        
+        .metrics-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+        }
+        
+        .card-body-custom {
+            padding: 1rem;
+        }
+        
+        .forecast-table {
+            font-size: 0.875rem;
+        }
+        
+        .forecast-table th,
+        .forecast-table td {
+            padding: 0.75rem 0.5rem;
+        }
+        
+        .action-btn-large {
+            display: block;
+            margin: 0.5rem 0;
+            width: 100%;
+        }
+    }
+
+    /* No data state */
+    .no-data-state {
+        text-align: center;
+        padding: 2rem;
+        color: #6b7280;
+    }
+
+    .no-data-icon {
+        width: 4rem;
+        height: 4rem;
+        margin: 0 auto 1rem;
+        opacity: 0.5;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="dashboard-container">
+        <!-- Key Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card primary animate-slide-up">
+                <div class="metric-content">
+                    <div class="metric-title">Current Balance</div>
+                    <h2 class="metric-value">${{ "%.2f"|format(current_balance) }}</h2>
+                </div>
+            </div>
+            <div class="metric-card success animate-slide-up">
+                <div class="metric-content">
+                    <div class="metric-title">Monthly Income</div>
+                    <h2 class="metric-value">${{ "%.2f"|format(cash_flow.monthly_income) }}</h2>
+                </div>
+            </div>
+            <div class="metric-card danger animate-slide-up">
+                <div class="metric-content">
+                    <div class="metric-title">Monthly Expenses</div>
+                    <h2 class="metric-value">${{ "%.2f"|format(cash_flow.monthly_expenses) }}</h2>
+                </div>
+            </div>
+            <div class="metric-card {{ 'info' if cash_flow.net_monthly_flow > 0 else 'warning' }} animate-slide-up">
+                <div class="metric-content">
+                    <div class="metric-title">Net Monthly Flow</div>
+                    <h2 class="metric-value">${{ "%.2f"|format(cash_flow.net_monthly_flow) }}</h2>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content Grid -->
+        <div class="content-grid">
+            <!-- Quick Forecasts -->
+            <div class="main-card animate-fade-in">
+                <div class="card-header-custom">
+                    <h4 class="card-header-title">
+                        <div class="header-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"></path>
+                                <path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"></path>
+                                <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0"></path>
+                                <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"></path>
+                            </svg>
+                        </div>
+                        Quick Goal Forecasts
+                    </h4>
+                </div>
+                <div class="card-body-custom">
+                    {% if quick_forecasts %}
+                    <div style="overflow-x: auto;">
+                        <table class="forecast-table">
+                            <thead>
+                                <tr>
+                                    <th>Goal Amount</th>
+                                    <th>Time to Achieve</th>
+                                    <th>Target Date</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for forecast in quick_forecasts %}
+                                <tr>
+                                    <td class="amount-cell">${{ "{:,}".format(forecast.amount|int) }}</td>
+                                    <td class="months-cell">{{ forecast.months }} months</td>
+                                    <td class="date-cell">{{ forecast.date.strftime('%b %Y') }}</td>
+                                    <td>
+                                        <a href="{{ url_for('main.forecast') }}" class="action-btn">
+                                            Detailed Forecast
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert-custom">
+                        <div class="no-data-state">
+                            <svg class="no-data-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <circle cx="12" cy="12" r="10"></circle>
+                                <path d="M12 6v6l4 2"></path>
+                            </svg>
+                            <p><strong>No achievable goals with current cash flow.</strong></p>
+                        </div>
+                        <p>Consider the following strategies:</p>
+                        <ul>
+                            <li>Increasing your monthly income through side projects or career advancement</li>
+                            <li>Reducing your monthly expenses by reviewing and optimizing your budget</li>
+                            <li>Setting smaller, more achievable short-term financial goals</li>
+                            <li>Exploring investment opportunities to grow your money faster</li>
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Spending Analysis -->
+            <div class="spending-card animate-fade-in" style="animation-delay: 0.2s;">
+                <div class="card-header-custom">
+                    <h5 class="card-header-title">
+                        <div class="header-icon">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                                <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                            </svg>
+                        </div>
+                        Spending Breakdown
+                    </h5>
+                </div>
+                <div class="card-body-custom">
+                    {% if spending_analysis %}
+                    {% for category in spending_analysis %}
+                    <div class="spending-item">
+                        <span class="spending-category">{{ category.category }}</span>
+                        <span class="spending-badge">${{ "%.0f"|format(category.total_amount) }}</span>
+                    </div>
+                    {% endfor %}
+                    <div class="chart-container">
+                        <canvas id="dashboardSpendingChart"></canvas>
+                    </div>
+                    {% else %}
+                    <div class="no-data-state">
+                        <svg class="no-data-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                            <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                        </svg>
+                        <p class="text-muted">No expense data available</p>
+                        <p><small>Start tracking your transactions to see spending insights</small></p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="action-section animate-fade-in" style="animation-delay: 0.4s;">
+            <a href="{{ url_for('main.forecast') }}" class="action-btn-large">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem; vertical-align: middle;">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Create New Forecast
+            </a>
+            <a href="{{ url_for('main.transactions') }}" class="action-btn-large action-btn-secondary">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 0.5rem; vertical-align: middle;">
+                    <line x1="8" y1="6" x2="21" y2="6"></line>
+                    <line x1="8" y1="12" x2="21" y2="12"></line>
+                    <line x1="8" y1="18" x2="21" y2="18"></line>
+                    <line x1="3" y1="6" x2="3.01" y2="6"></line>
+                    <line x1="3" y1="12" x2="3.01" y2="12"></line>
+                    <line x1="3" y1="18" x2="3.01" y2="18"></line>
+                </svg>
+                Manage Transactions
+            </a>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dashboard spending chart
+            {% if spending_analysis %}
+            const dashCtx = document.getElementById('dashboardSpendingChart');
+            if (dashCtx) {
+                const chart = new Chart(dashCtx.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: [{% for category in spending_analysis %}'{{ category.category }}'{% if not loop.last %},{% endif %}{% endfor %}],
+                        datasets: [{
+                            data: [{% for category in spending_analysis %}{{ category.total_amount }}{% if not loop.last %},{% endif %}{% endfor %}],
+                            backgroundColor: [
+                                '#667eea',
+                                '#764ba2', 
+                                '#f093fb',
+                                '#f5576c',
+                                '#4facfe',
+                                '#00f2fe',
+                                '#43e97b',
+                                '#38f9d7',
+                                '#ffecd2',
+                                '#fcb69f'
+                            ],
+                            borderWidth: 0,
+                            hoverBorderWidth: 3,
+                            hoverBorderColor: '#ffffff'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                position: 'bottom',
+                                labels: {
+                                    padding: 20,
+                                    usePointStyle: true,
+                                    font: {
+                                        size: 12,
+                                        weight: '500'
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                                titleColor: '#ffffff',
+                                bodyColor: '#ffffff',
+                                borderColor: '#667eea',
+                                borderWidth: 1,
+                                cornerRadius: 8,
+                                displayColors: true,
+                                callbacks: {
+                                    label: function(context) {
+                                        const label = context.label || '';
+                                        const value = context.parsed || 0;
+                                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                        const percentage = ((value / total) * 100).toFixed(1);
+                                        return `${label}: $${value.toFixed(0)} (${percentage}%)`;
+                                    }
+                                }
+                            }
+                        },
+                        cutout: '60%',
+                        elements: {
+                            arc: {
+                                borderRadius: 4
+                            }
+                        },
+                        animation: {
+                            animateRotate: true,
+                            duration: 1000,
+                            easing: 'easeOutCubic'
+                        }
+                    }
+                });
+
+                // Add hover effect to spending items that highlights chart
+                const spendingItems = document.querySelectorAll('.spending-item');
+                spendingItems.forEach((item, index) => {
+                    item.addEventListener('mouseenter', () => {
+                        chart.setActiveElements([{
+                            datasetIndex: 0,
+                            index: index
+                        }]);
+                        chart.update('none');
+                    });
+
+                    item.addEventListener('mouseleave', () => {
+                        chart.setActiveElements([]);
+                        chart.update('none');
+                    });
+                });
+            }
+            {% endif %}
+
+            // Add loading states to action buttons
+            const actionButtons = document.querySelectorAll('.action-btn, .action-btn-large');
+            actionButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const originalText = this.innerHTML;
+                    this.style.opacity = '0.7';
+                    this.style.pointerEvents = 'none';
+                    
+                    // Reset after page navigation or 3 seconds
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                        this.style.opacity = '1';
+                        this.style.pointerEvents = 'auto';
+                    }, 3000);
+                });
+            });
+
+            // Animate numbers on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        const element = entry.target;
+                        const finalValue = parseFloat(element.textContent.replace(/[^0-9.-]/g, ''));
+                        
+                        if (!isNaN(finalValue)) {
+                            animateNumber(element, 0, finalValue, 1000);
+                        }
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all metric values
+            document.querySelectorAll('.metric-value').forEach(el => {
+                observer.observe(el);
+            });
+
+            function animateNumber(element, start, end, duration) {
+                const range = end - start;
+                const minTimer = 50;
+                const stepTime = Math.abs(Math.floor(duration / range));
+                const timer = Math.max(stepTime, minTimer);
+                const startTime = new Date().getTime();
+                const endTime = startTime + duration;
+                
+                function run() {
+                    const now = new Date().getTime();
+                    const remaining = Math.max((endTime - now) / duration, 0);
+                    const value = Math.round(end - (remaining * range));
+                    const prefix = element.textContent.includes('$') ? '$' : '';
+                    
+                    element.textContent = prefix + value.toFixed(2);
+                    
+                    if (value !== end) {
+                        setTimeout(run, timer);
+                    }
+                }
+                
+                run();
+            }
+        });
+    </script>
+{% endblock %}

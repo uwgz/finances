@@ -1,0 +1,518 @@
+{% extends "_base.html" %}
+
+{% block title %}Financial Goal Forecast{% endblock %}
+
+{% block header %}Set Your Financial Goal{% endblock %}
+
+{% block extra_css %}
+<style>
+    :root {
+        --primary-color: #667eea;
+        --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        --success-color: #10b981;
+        --warning-color: #f59e0b;
+        --danger-color: #ef4444;
+        --info-color: #3b82f6;
+        --light-bg: #f8fafc;
+        --card-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        --card-shadow-hover: 0 20px 40px rgba(0, 0, 0, 0.15);
+        --border-radius: 12px;
+        --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .content {
+        background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+        min-height: 100vh;
+        padding: 2rem 0;
+    }
+
+    .financial-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 0 1rem;
+    }
+
+    .main-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        border: none;
+        overflow: hidden;
+        transition: var(--transition);
+        margin-bottom: 2rem;
+    }
+
+    .main-card:hover {
+        box-shadow: var(--card-shadow-hover);
+        transform: translateY(-2px);
+    }
+
+    .card-header-custom {
+        background: var(--primary-gradient);
+        color: white;
+        padding: 1.5rem 2rem;
+        border: none;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .card-header-custom::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+        transition: left 0.5s;
+    }
+
+    .card-header-custom:hover::before {
+        left: 100%;
+    }
+
+    .card-header-title {
+        margin: 0;
+        font-size: 1.5rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+    }
+
+    .header-icon {
+        width: 2rem;
+        height: 2rem;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .card-body-custom {
+        padding: 2rem;
+    }
+
+    /* Financial Overview Cards */
+    .overview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 2.5rem;
+    }
+
+    .metric-card {
+        background: white;
+        border-radius: var(--border-radius);
+        padding: 1.5rem;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+        border: 1px solid rgba(0, 0, 0, 0.05);
+        transition: var(--transition);
+        position: relative;
+        overflow: hidden;
+    }
+
+    .metric-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: var(--primary-gradient);
+    }
+
+    .metric-card:hover {
+        transform: translateY(-4px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    }
+
+    .metric-card.success::before {
+        background: linear-gradient(135deg, #10b981, #059669);
+    }
+
+    .metric-card.info::before {
+        background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+    }
+
+    .metric-card.warning::before {
+        background: linear-gradient(135deg, #f59e0b, #d97706);
+    }
+
+    .metric-card.danger::before {
+        background: linear-gradient(135deg, #ef4444, #dc2626);
+    }
+
+    .metric-title {
+        font-size: 0.875rem;
+        font-weight: 500;
+        color: #6b7280;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .metric-value {
+        font-size: 2rem;
+        font-weight: 700;
+        margin: 0;
+        color: #111827;
+    }
+
+    .metric-value.success { color: var(--success-color); }
+    .metric-value.info { color: var(--info-color); }
+    .metric-value.warning { color: var(--warning-color); }
+    .metric-value.danger { color: var(--danger-color); }
+
+    /* Form Styling */
+    .goal-form {
+        display: grid;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        position: relative;
+    }
+
+    .form-label-custom {
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 0.5rem;
+        display: block;
+        font-size: 0.875rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .form-control-custom {
+        width: 100%;
+        padding: 0.875rem 1rem;
+        border: 2px solid #e5e7eb;
+        border-radius: 8px;
+        font-size: 1rem;
+        transition: var(--transition);
+        background: white;
+    }
+
+    .form-control-custom:focus {
+        outline: none;
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        transform: translateY(-1px);
+    }
+
+    .form-control-lg-custom {
+        padding: 1rem 1.25rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+    }
+
+    .form-text-custom {
+        font-size: 0.75rem;
+        color: #6b7280;
+        margin-top: 0.25rem;
+    }
+
+    .submit-btn {
+        background: var(--primary-gradient);
+        border: none;
+        color: white;
+        padding: 1rem 2rem;
+        font-size: 1.125rem;
+        font-weight: 600;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: var(--transition);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .submit-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+    }
+
+    /* Quick Goals Section */
+    .quick-goals-card {
+        background: white;
+        border-radius: var(--border-radius);
+        box-shadow: var(--card-shadow);
+        overflow: hidden;
+    }
+
+    .quick-goals-header {
+        background: linear-gradient(135deg, #f3f4f6, #e5e7eb);
+        padding: 1rem 1.5rem;
+        border-bottom: 1px solid #e5e7eb;
+    }
+
+    .quick-goals-title {
+        margin: 0;
+        font-size: 1.125rem;
+        font-weight: 600;
+        color: #374151;
+    }
+
+    .quick-goals-body {
+        padding: 1.5rem;
+    }
+
+    .quick-goals-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+        gap: 1rem;
+    }
+
+    .quick-goal-btn {
+        background: white;
+        border: 2px solid #e5e7eb;
+        color: #374151;
+        padding: 0.75rem 1rem;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: var(--transition);
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .quick-goal-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: var(--primary-gradient);
+        transition: left 0.3s;
+        z-index: -1;
+    }
+
+    .quick-goal-btn:hover {
+        color: white;
+        border-color: var(--primary-color);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+    }
+
+    .quick-goal-btn:hover::before {
+        left: 0;
+    }
+
+    .quick-goal-btn:active {
+        transform: translateY(0);
+    }
+
+    /* Animations */
+    @keyframes slideUp {
+        from {
+            opacity: 0;
+            transform: translateY(20px);
+        }
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .animate-slide-up {
+        animation: slideUp 0.6s ease-out;
+    }
+
+    .animate-slide-up:nth-child(2) { animation-delay: 0.1s; }
+    .animate-slide-up:nth-child(3) { animation-delay: 0.2s; }
+    .animate-slide-up:nth-child(4) { animation-delay: 0.3s; }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+        .financial-container {
+            padding: 0 0.5rem;
+        }
+        
+        .card-body-custom {
+            padding: 1.5rem;
+        }
+        
+        .overview-grid {
+            grid-template-columns: 1fr;
+            gap: 1rem;
+        }
+        
+        .quick-goals-grid {
+            grid-template-columns: repeat(2, 1fr);
+        }
+        
+        .metric-value {
+            font-size: 1.5rem;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+    <div class="financial-container">
+        <!-- Main Goal Setting Card -->
+        <div class="main-card animate-slide-up">
+            <div class="card-header-custom">
+                <h3 class="card-header-title">
+                    <div class="header-icon">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"></circle>
+                            <circle cx="12" cy="12" r="6"></circle>
+                            <circle cx="12" cy="12" r="2"></circle>
+                        </svg>
+                    </div>
+                    Set Your Financial Goal
+                </h3>
+            </div>
+            <div class="card-body-custom">
+                <!-- Current Financial Overview -->
+                <div class="overview-grid">
+                    <div class="metric-card success animate-slide-up">
+                        <div class="metric-title">Current Balance</div>
+                        <h3 class="metric-value success">${{ "%.2f"|format(current_balance) }}</h3>
+                    </div>
+                    <div class="metric-card info animate-slide-up">
+                        <div class="metric-title">Monthly Income</div>
+                        <h3 class="metric-value info">${{ "%.2f"|format(cash_flow.monthly_income) }}</h3>
+                    </div>
+                    <div class="metric-card {{ 'success' if cash_flow.net_monthly_flow > 0 else 'danger' }} animate-slide-up">
+                        <div class="metric-title">Net Monthly Flow</div>
+                        <h3 class="metric-value {{ 'success' if cash_flow.net_monthly_flow > 0 else 'danger' }}">
+                            ${{ "%.2f"|format(cash_flow.net_monthly_flow) }}
+                        </h3>
+                    </div>
+                </div>
+
+                <!-- Goal Setting Form -->
+                <form method="POST" class="goal-form needs-validation" novalidate>
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="form-group">
+                        {{ form.goal_amount.label(class="form-label-custom") }}
+                        {{ form.goal_amount(class="form-control-custom form-control-lg-custom", placeholder="Enter your target amount") }}
+                        <div class="form-text-custom">Enter the total amount you want to save or achieve</div>
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.goal_type.label(class="form-label-custom") }}
+                        {{ form.goal_type(class="form-control-custom") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.goal_description.label(class="form-label-custom") }}
+                        {{ form.goal_description(class="form-control-custom", placeholder="Describe your financial goal...", rows="3") }}
+                    </div>
+
+                    <div class="form-group">
+                        {{ form.submit(class="submit-btn") }}
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Quick Goal Examples -->
+        <div class="quick-goals-card animate-slide-up">
+            <div class="quick-goals-header">
+                <h5 class="quick-goals-title">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: inline; margin-right: 0.5rem; vertical-align: middle;">
+                        <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path>
+                    </svg>
+                    Quick Goal Examples
+                </h5>
+            </div>
+            <div class="quick-goals-body">
+                <div class="quick-goals-grid">
+                    <button class="quick-goal-btn" data-amount="1000">$1,000</button>
+                    <button class="quick-goal-btn" data-amount="5000">$5,000</button>
+                    <button class="quick-goal-btn" data-amount="10000">$10,000</button>
+                    <button class="quick-goal-btn" data-amount="25000">$25,000</button>
+                    <button class="quick-goal-btn" data-amount="50000">$50,000</button>
+                    <button class="quick-goal-btn" data-amount="100000">$100,000</button>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block extra_js %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Quick goal button functionality
+            document.querySelectorAll('.quick-goal-btn').forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const amount = this.dataset.amount;
+                    const goalAmountField = document.getElementById('goal_amount');
+                    if (goalAmountField) {
+                        goalAmountField.value = amount;
+                        goalAmountField.focus();
+                        
+                        // Add visual feedback
+                        this.style.transform = 'scale(0.95)';
+                        setTimeout(() => {
+                            this.style.transform = '';
+                        }, 150);
+                    }
+                });
+            });
+
+            // Enhanced form validation
+            (function() {
+                'use strict';
+                window.addEventListener('load', function() {
+                    var forms = document.getElementsByClassName('needs-validation');
+                    var validation = Array.prototype.filter.call(forms, function(form) {
+                        form.addEventListener('submit', function(event) {
+                            if (form.checkValidity() === false) {
+                                event.preventDefault();
+                                event.stopPropagation();
+                            }
+                            form.classList.add('was-validated');
+                        }, false);
+                    });
+                }, false);
+            })();
+
+            // Add loading state to submit button
+            const submitBtn = document.querySelector('.submit-btn');
+            const form = document.querySelector('.goal-form');
+            
+            if (form && submitBtn) {
+                form.addEventListener('submit', function() {
+                    submitBtn.innerHTML = `
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation: spin 1s linear infinite; margin-right: 0.5rem;">
+                            <path d="M21 12a9 9 0 11-6.219-8.56"/>
+                        </svg>
+                        Processing...
+                    `;
+                    submitBtn.disabled = true;
+                });
+            }
+
+            // Auto-format currency input
+            const goalAmountInput = document.getElementById('goal_amount');
+            if (goalAmountInput) {
+                goalAmountInput.addEventListener('input', function(e) {
+                    let value = e.target.value.replace(/[^\d.]/g, '');
+                    if (value.split('.').length > 2) {
+                        value = value.replace(/\.+$/, '');
+                    }
+                    e.target.value = value;
+                });
+            }
+        });
+
+        // Add CSS for spin animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes spin {
+                from { transform: rotate(0deg); }
+                to { transform: rotate(360deg); }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+{% endblock %}

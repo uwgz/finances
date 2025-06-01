@@ -10,7 +10,7 @@
 <body>
     <div class="container">
         <!-- Sidebar -->
-        <aside class="sidebar">
+        <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
                 <div class="sidebar-logo">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -18,8 +18,15 @@
                         <path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"></path>
                         <path d="M12 18V6"></path>
                     </svg>
-                    My Finances
+                    <span>My Finances</span>
                 </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
             </div>
             <nav class="sidebar-nav">
                 <a href="{{ url_for('main.dashboard') }}" class="nav-item {% if request.path == url_for('main.dashboard') or request.path == '/dashboard/feeds' %}active{% endif %}">
@@ -27,7 +34,7 @@
                         <path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path>
                         <path d="M3 10a2 2 0 0 1 .709-1.528l7-5.999a2 2 0 0 1 2.582 0l7 5.999A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
                     </svg>
-                    Dashboard
+                    <span>Dashboard</span>
                 </a>
                 <a href="{{ url_for('main.transactions') }}" class="nav-item {% if request.path.startswith('/dashboard/feeds/transactions') %}active{% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -38,14 +45,29 @@
                         <path d="M8 18h13"></path>
                         <path d="M8 6h13"></path>
                     </svg>
-                    Transactions
+                    <span>Transactions</span>
                 </a>
-                <a href="{{ url_for('main.predictor') }}" class="nav-item {% if request.path.startswith('/dashboard/feeds/predictor') %}active{% endif %}">
+                <a href="#" class="nav-item {% if request.path.startswith('/dashboard/feeds/predictor') %}active{% endif %}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M3 3v18h18"></path>
                         <path d="M3 12l5-5 4 4 5-5 4 4"></path>
                     </svg>
-                    Predictor
+                    <span>Predictor</span>
+                </a>
+                <a href="{{ url_for('main.forecast') }}" class="nav-item {% if request.path == url_for('main.forecast') %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <circle cx="12" cy="12" r="6"></circle>
+                        <circle cx="12" cy="12" r="2"></circle>
+                    </svg>
+                    <span>Set Goal</span>
+                </a>
+                <a href="{{ url_for('main.forecast_dashboard') }}" class="nav-item {% if request.path == url_for('main.forecast_dashboard') %}active{% endif %}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 3v18h18"></path>
+                        <path d="m19 9-5 5-4-4-3 3"></path>
+                    </svg>
+                    <span>Forecast Dashboard</span>
                 </a>
 
                 <a href="{{ url_for('main.settings') }}" class="nav-item {% if request.path.startswith('/dashboard/feeds/settings') %}active{% endif %}">
@@ -53,13 +75,13 @@
                         <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"></path>
                         <circle cx="12" cy="12" r="3"></circle>
                     </svg>
-                    Settings
+                    <span>Settings</span>
                 </a>
             </nav>
         </aside>
 
         <!-- Main content -->
-        <main class="main-content">
+        <main class="main-content" id="mainContent">
             <header class="header">
                 <div class="header-content">
                     <div class="header-left">
@@ -67,7 +89,7 @@
                     </div>
                     <div class="header-right">
                         <div class="user-profile">
-                            <span class="username">Patrick Uwigize</span>
+                            <span class="username">{{ current_user.first_name if current_user and current_user.is_authenticated else 'Guest' }}</span>
                             <a href="{{ url_for('main.settings') }}" class="avatar-link">
                                 <div class="avatar">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -101,5 +123,34 @@
     </div>
 
     {% block extra_js %}{% endblock %}
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sidebar = document.getElementById('sidebar');
+            const mainContent = document.getElementById('mainContent');
+            const sidebarToggle = document.getElementById('sidebarToggle');
+            const mediumScreenWidth = 768;
+
+            function toggleSidebar() {
+                if (window.innerWidth <= mediumScreenWidth) {
+                    sidebar.classList.toggle('open');
+                    mainContent.classList.toggle('shifted');
+                } else {
+                    sidebar.classList.toggle('collapsed');
+                    mainContent.classList.toggle('collapsed');
+                }
+            }
+
+            if (sidebarToggle) {
+                sidebarToggle.addEventListener('click', toggleSidebar);
+            }
+
+            // Optional: Collapse sidebar by default on larger screens if preferred
+            // if (window.innerWidth > mediumScreenWidth) {
+            //     sidebar.classList.add('collapsed');
+            //     mainContent.classList.add('collapsed');
+            // }
+        });
+    </script>
 </body>
 </html>
